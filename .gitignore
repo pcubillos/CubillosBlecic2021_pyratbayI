@@ -4,6 +4,7 @@
 *.states
 *.pf
 *.bz2
+*.tli
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
