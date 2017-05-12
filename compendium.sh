@@ -10,19 +10,19 @@ make
 cd $topdir
 git clone https://github.com/pcubillos/repack
 cd $topdir/repack
-git checkout 7da48c3  # FINDME: Update when final
+git checkout 34d1e9e  # FINDME: Update when final
 make
 
 
 # Download Exomol data:
 cd $topdir/inputs/opacity
 wget -i wget_exomol_NH3.txt
+wget -i wget_exomol_CH4.txt
 wget -i wget_exomol_HCN.txt
-bzip2 -d *.bz2
 
 # Download HITRAN/HITEMP data:
 cd $topdir/inputs/opacity
-wget --user=HITRAN --password=getdata -N -i wget_hitemp_H2O_CO2_CO_CH4.txt
+wget --user=HITRAN --password=getdata -N -i wget_hitemp_H2O_CO2_CO.txt
 unzip '*.zip'
 rm -f *.zip
 
@@ -36,6 +36,7 @@ cd $topdir/run01
 $topdir/repack/repack.py repack_H2O.cfg
 $topdir/repack/repack.py repack_HCN.cfg
 $topdir/repack/repack.py repack_NH3.cfg
+$topdir/repack/repack.py repack_CH4.cfg
 
 # :::  OK  :::
 

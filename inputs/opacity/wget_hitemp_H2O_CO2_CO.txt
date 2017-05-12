@@ -50,4 +50,3 @@ https://www.cfa.harvard.edu/HITRAN/HITEMP-2010/CO2_line_list/02_00625-00750_HITE
 https://www.cfa.harvard.edu/HITRAN/HITEMP-2010/CO2_line_list/02_00500-00625_HITEMP2010.zip
 https://www.cfa.harvard.edu/HITRAN/HITEMP-2010/CO2_line_list/02_00000-00500_HITEMP2010.zip
 https://www.cfa.harvard.edu/HITRAN/HITEMP-2010/CO_line_list/05_HITEMP2010.zip
-https://www.cfa.harvard.edu/HITRAN/HITRAN2012/HITRAN2012/By-Molecule/Compressed-files/06_hit12.zip
