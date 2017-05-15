@@ -56,27 +56,27 @@ $topdir/pyratbay/pbay.py -c tli_hitemp_CO.cfg
 $topdir/pyratbay/pbay.py -c tli_hitemp_H2O.cfg
 $topdir/pyratbay/pbay.py -c tli_exomol_HCN.cfg
 $topdir/pyratbay/pbay.py -c tli_exomol_NH3.cfg
-# :::  OK  :::
 $topdir/pyratbay/pbay.py -c tli_exomol_CH4.cfg
 
 
 # Make atmospheric files:
 cd $topdir/run01/
-$topdir/pyratbay/pbay.py -c atm_000.10xsolar.cfg
-$topdir/pyratbay/pbay.py -c atm_001.00xsolar.cfg
-$topdir/pyratbay/pbay.py -c atm_100.00xsolar.cfg
+$topdir/pyratbay/pbay.py -c atm_1xsolar_1000K.cfg
+$topdir/pyratbay/pbay.py -c atm_1xsolar_1500K.cfg
+$topdir/pyratbay/pbay.py -c atm_1xsolar_2000K.cfg
+$topdir/pyratbay/pbay.py -c atm_1xsolar_2500K.cfg
+# :::  OK  :::
+$topdir/pyratbay/pbay.py -c atm_uniform.cfg
 
 
-# Make H2O opacity file:
+# Make nominal opacity file (H2O CO CO2 CH4 HCN NH3):
 cd $topdir/run01/
-$topdir/pyratbay/pbay.py -c opacity_H2O.cfg
+$topdir/pyratbay/pbay.py -c opacity.cfg
 
 
 # Run MCMC for solar abundance model:
-cd $topdir/run02/
-$topdir/pyratbay/pbay.py -c mcmc_000.1xsolar.cfg
+cd $topdir/run01/
 $topdir/pyratbay/pbay.py -c mcmc_001.0xsolar.cfg
-$topdir/pyratbay/pbay.py -c mcmc_100.0xsolar.cfg
 
 
 # Figure 3:

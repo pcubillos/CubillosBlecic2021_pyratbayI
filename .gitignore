@@ -5,6 +5,7 @@
 *.pf
 *.bz2
 *.tli
+*.atm
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
