@@ -5,7 +5,7 @@ topdir=`pwd`
 cd $topdir
 git clone --recursive https://github.com/pcubillos/pyratbay
 cd $topdir/pyratbay
-git checkout 33f4c70  # FINDME: Update when final
+git checkout fb03915  # FINDME: Update when final
 make
 
 cd $topdir
@@ -65,18 +65,19 @@ $topdir/pyratbay/pbay.py -c atm_1xsolar_1000K.cfg
 $topdir/pyratbay/pbay.py -c atm_1xsolar_1500K.cfg
 $topdir/pyratbay/pbay.py -c atm_1xsolar_2000K.cfg
 $topdir/pyratbay/pbay.py -c atm_1xsolar_2500K.cfg
-# :::  OK  :::
 $topdir/pyratbay/pbay.py -c atm_uniform.cfg
-
 
 # Make nominal opacity file (H2O CO CO2 CH4 HCN NH3):
 cd $topdir/run01/
-$topdir/pyratbay/pbay.py -c opacity.cfg
+$topdir/pyratbay/pbay.py -c opacity_nominal_0.3-33um.cfg
+$topdir/pyratbay/pbay.py -c opacity_nominal_0.3-5.0um.cfg
+$topdir/pyratbay/pbay.py -c opacity_nominal_1.0-5.0um.cfg  # TBD
 
+# Run MCMC retrievals:
+cd $topdir/run02_HATP01b/
+$topdir/pyratbay/pbay.py -c mcmc_hatp01b.cfg
 
-# Run MCMC for solar abundance model:
-cd $topdir/run01/
-$topdir/pyratbay/pbay.py -c mcmc_001.0xsolar.cfg
+# :::  OK  :::
 
 
 # Figure 3:
