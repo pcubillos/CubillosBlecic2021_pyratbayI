@@ -5,15 +5,18 @@ topdir=`pwd`
 cd $topdir
 git clone --recursive https://github.com/pcubillos/pyratbay
 cd $topdir/pyratbay
-git checkout fb03915  # FINDME: Update when final
+git checkout cea5ca0  # FINDME: Update when final
 make
 
 cd $topdir
 git clone https://github.com/pcubillos/repack
 cd $topdir/repack
-git checkout 34d1e9e  # FINDME: Update when final
+git checkout 4ba3633  # FINDME: Update when final
 make
 
+# Generate filter files:
+cd $topdir/code
+$topdir/code/make_filters.py > $topdir/code/filter_info.txt
 
 # Download Exomol data:
 cd $topdir/inputs/opacity
@@ -26,6 +29,15 @@ cd $topdir/inputs/opacity
 wget --user=HITRAN --password=getdata -N -i wget_hitemp_H2O_CO2_CO.txt
 unzip '*.zip'
 rm -f *.zip
+
+# Download CO data:
+cd $topdir/inputs/opacity
+wget http://iopscience.iop.org/0067-0049/216/1/15/suppdata/apjs504015_data.tar.gz
+
+# Download TiO data:
+cd $topdir/inputs/opacity
+wget http://kurucz.harvard.edu/molecules/tio/tioschwenke.bin
+wget http://kurucz.harvard.edu/molecules/tio/tiopart.dat
 
 
 # Generate partition-function files for H2O and NH3:
@@ -70,14 +82,48 @@ $topdir/pyratbay/pbay.py -c atm_uniform.cfg
 # Make nominal opacity file (H2O CO CO2 CH4 HCN NH3):
 cd $topdir/run01/
 $topdir/pyratbay/pbay.py -c opacity_nominal_0.3-33um.cfg
-$topdir/pyratbay/pbay.py -c opacity_nominal_0.3-5.0um.cfg
-$topdir/pyratbay/pbay.py -c opacity_nominal_1.0-5.0um.cfg  # TBD
+$topdir/pyratbay/pbay.py -c opacity_nominal_0.3-5.5um.cfg
+$topdir/pyratbay/pbay.py -c opacity_nominal_1.0-5.5um.cfg  # TBD
 
 # Run MCMC retrievals:
 cd $topdir/run02_HATP01b/
 $topdir/pyratbay/pbay.py -c mcmc_hatp01b.cfg
 
 # :::  OK  :::
+
+# Run transmission retrievals:
+cd $topdir/run02_HATP01b
+$topdir/pyratbay/pbay.py -c mcmc_hatp01b.cfg
+
+cd $topdir/run03_HATP11b
+$topdir/pyratbay/pbay.py -c mcmc_hatp11b.cfg
+
+cd $topdir/run04_HATP12b
+$topdir/pyratbay/pbay.py -c mcmc_hatp12b.cfg
+
+cd $topdir/run05_HATP26b
+$topdir/pyratbay/pbay.py -c mcmc_hatp26b.cfg
+
+cd $topdir/run06_WASP006b
+$topdir/pyratbay/pbay.py -c mcmc_wasp006b.cfg
+
+cd $topdir/run07_WASP012b
+$topdir/pyratbay/pbay.py -c mcmc_wasp012b.cfg
+
+cd $topdir/run08_WASP017b
+$topdir/pyratbay/pbay.py -c mcmc_wasp017b.cfg
+
+cd $topdir/run09_WASP019b
+$topdir/pyratbay/pbay.py -c mcmc_wasp019b.cfg
+
+cd $topdir/run10_WASP031b
+$topdir/pyratbay/pbay.py -c mcmc_wasp031b.cfg
+
+cd $topdir/run11_WASP039b
+$topdir/pyratbay/pbay.py -c mcmc_wasp039b.cfg
+
+cd $topdir/run15_WASP121b
+$topdir/pyratbay/pbay.py -c mcmc_wasp121b.cfg
 
 
 # Figure 3:

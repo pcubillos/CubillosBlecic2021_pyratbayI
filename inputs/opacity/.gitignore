@@ -1,0 +1,6 @@
+gnore everything in this directory
+*
+# Except these files
+!.gitignore
+!wget*.txt
+
