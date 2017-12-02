@@ -26,13 +26,16 @@ wget -i wget_exomol_HCN.txt
 
 # Download HITRAN/HITEMP data:
 cd $topdir/inputs/opacity
-wget --user=HITRAN --password=getdata -N -i wget_hitemp_H2O_CO2_CO.txt
+wget --user=HITRAN --password=getdata -N -i wget_hitemp_H2O_CO2.txt
 unzip '*.zip'
 rm -f *.zip
 
 # Download CO data:
 cd $topdir/inputs/opacity
 wget http://iopscience.iop.org/0067-0049/216/1/15/suppdata/apjs504015_data.tar.gz
+tar -xvzf apjs504015_data.tar.gz
+rm -f apjs504015_data.tar.gz ReadMe Table_S1.txt Table_S2.txt \
+      Table_S3.txt Table_S6.par
 
 # Download TiO data:
 cd $topdir/inputs/opacity
@@ -44,13 +47,15 @@ wget http://kurucz.harvard.edu/molecules/tio/tiopart.dat
 cd $topdir/run01
 $topdir/code/pf_tips_H2O-NH3.py
 
-# Generate partition-function files for HCN and CH4:
+# Generate partition-function files for HCN, CH4, and TiO:
 cd $topdir/run01
-$topdir/pyratbay/scripts/PFformat_Exomol.py \
+$topdir/pyratbay/scripts/PFformat_Exomol.py        \
       $topdir/inputs/opacity/1H-12C-14N__Harris.pf \
       $topdir/inputs/opacity/1H-13C-14N__Larner.pf
 $topdir/pyratbay/scripts/PFformat_Exomol.py \
       $topdir/inputs/opacity/12C-1H4__YT10to10.pf
+$topdir/pyratbay/scripts/PFformat_Schwenke_TiO.py \
+      $topdir/inputs/opacity/tiopart.dat
 
 
 # Compress LBL databases:
@@ -59,6 +64,7 @@ $topdir/repack/repack.py repack_H2O.cfg
 $topdir/repack/repack.py repack_HCN.cfg
 $topdir/repack/repack.py repack_NH3.cfg
 $topdir/repack/repack.py repack_CH4.cfg
+$topdir/repack/repack.py repack_TiO.cfg
 
 
 # Make TLI files:

@@ -1,4 +1,7 @@
 # Pyrat Bay inputs
+pyratbay/
+repack/
+run01/TEA.cfg
 *.trans
 *.par
 *.states
