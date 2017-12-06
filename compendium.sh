@@ -70,11 +70,12 @@ $topdir/repack/repack.py repack_TiO.cfg
 # Make TLI files:
 cd $topdir/run01/
 $topdir/pyratbay/pbay.py -c tli_hitemp_CO2.cfg
-$topdir/pyratbay/pbay.py -c tli_hitemp_CO.cfg
+$topdir/pyratbay/pbay.py -c tli_Li_CO.cfg
 $topdir/pyratbay/pbay.py -c tli_hitemp_H2O.cfg
 $topdir/pyratbay/pbay.py -c tli_exomol_HCN.cfg
 $topdir/pyratbay/pbay.py -c tli_exomol_NH3.cfg
 $topdir/pyratbay/pbay.py -c tli_exomol_CH4.cfg
+$topdir/pyratbay/pbay.py -c tli_Schwenke_TiO.cfg
 
 
 # Make atmospheric files:
