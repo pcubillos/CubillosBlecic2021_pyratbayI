@@ -92,11 +92,11 @@ python $topdir/pyratbay/pbay.py -c opacity_nominal_0.3-33um.cfg
 python $topdir/pyratbay/pbay.py -c opacity_nominal_0.3-5.5um.cfg
 python $topdir/pyratbay/pbay.py -c opacity_nominal_1.0-5.5um.cfg
 
-# Run MCMC retrievals:
+
+# Run MCMC transmission retrievals:
 cd $topdir/run02_HATP01b/
 python $topdir/pyratbay/pbay.py -c mcmc_hatp01b.cfg
 
-# :::  OK  :::
 
 # Run transmission retrievals:
 cd $topdir/run02_HATP01b
