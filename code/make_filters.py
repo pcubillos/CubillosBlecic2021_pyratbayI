@@ -52,6 +52,12 @@ if __name__ == "__main__":
       fdata.remove(f)
   fdata = sorted(fdata)
 
+  # Prep up SPITZER filters:
+  irac = ["../pyratbay/inputs/filters/spitzer_irac1_sa.dat",
+          "../pyratbay/inputs/filters/spitzer_irac2_sa.dat",
+          "../pyratbay/inputs/filters/spitzer_irac3_sa.dat",
+          "../pyratbay/inputs/filters/spitzer_irac4_sa.dat"]
+  swave = np.array([3.6, 4.5, 5.8, 8.0, 24])
 
   # Read data:
   for j in np.arange(len(fdata)):
@@ -76,7 +82,13 @@ if __name__ == "__main__":
         width = float(width) * 2.0
         rprs  = float(rprs)
         runc  = float(runc)
-        ffile = "../inputs/filters/{:s}_{:s}_{:5.3f}um.dat".format(planet,
+        if inst.startswith("irac"):
+          k = np.argmin(np.abs(swave-wl))
+          ffile = irac[k]
+        elif inst.startswith("mips"):
+          ffile = "../pyratbay/inputs/filters/spitzer_mips24.dat"
+        else:
+          ffile = "../inputs/filters/{:s}_{:s}_{:5.3f}um.dat".format(planet,
                                                                    inst, wl)
         if (inst.startswith("stis") or inst.startswith("wfc3")   or
             inst.startswith("acs")  or inst.startswith("nicmos") ):
