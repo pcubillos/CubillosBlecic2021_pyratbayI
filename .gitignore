@@ -2,6 +2,7 @@
 pyratbay/
 repack/
 run01/TEA.cfg
+code/filter_info.txt
 *.trans
 *.par
 *.states
@@ -9,6 +10,7 @@ run01/TEA.cfg
 *.bz2
 *.tli
 *.atm
+*.swp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

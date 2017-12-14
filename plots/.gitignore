@@ -2,5 +2,3 @@
 *
 # Except these files
 !.gitignore
-!wget*.txt
-
