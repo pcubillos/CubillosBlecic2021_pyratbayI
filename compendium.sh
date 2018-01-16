@@ -37,12 +37,6 @@ tar -xvzf apjs504015_data.tar.gz
 rm -f apjs504015_data.tar.gz ReadMe Table_S1.txt Table_S2.txt \
       Table_S3.txt Table_S6.par
 
-# Download TiO data:
-cd $topdir/inputs/opacity
-wget http://kurucz.harvard.edu/molecules/tio/tioschwenke.bin
-wget http://kurucz.harvard.edu/molecules/tio/tiopart.dat
-
-
 # Generate partition-function files for H2O and NH3:
 cd $topdir/run01
 python $topdir/code/pf_tips_H2O-NH3.py
@@ -64,7 +58,6 @@ python $topdir/repack/repack.py repack_H2O.cfg
 python $topdir/repack/repack.py repack_HCN.cfg
 python $topdir/repack/repack.py repack_NH3.cfg
 python $topdir/repack/repack.py repack_CH4.cfg
-python $topdir/repack/repack.py repack_TiO.cfg
 
 
 # Make TLI files:
@@ -75,7 +68,6 @@ python $topdir/pyratbay/pbay.py -c tli_hitemp_H2O.cfg
 python $topdir/pyratbay/pbay.py -c tli_exomol_HCN.cfg
 python $topdir/pyratbay/pbay.py -c tli_exomol_NH3.cfg
 python $topdir/pyratbay/pbay.py -c tli_exomol_CH4.cfg
-python $topdir/pyratbay/pbay.py -c tli_Schwenke_TiO.cfg
 
 
 # Make atmospheric files:
@@ -88,8 +80,6 @@ python $topdir/pyratbay/pbay.py -c atm_uniform.cfg
 
 # Make nominal opacity file (H2O CO CO2 CH4 HCN NH3):
 cd $topdir/run01/
-python $topdir/pyratbay/pbay.py -c opacity_nominal_0.3-33um.cfg
-python $topdir/pyratbay/pbay.py -c opacity_nominal_0.3-5.5um.cfg
 python $topdir/pyratbay/pbay.py -c opacity_nominal_1.0-5.5um.cfg
 
 
@@ -99,39 +89,8 @@ python $topdir/pyratbay/pbay.py -c mcmc_hatp01b.cfg
 
 
 # Run transmission retrievals:
-cd $topdir/run02_HATP01b
-python $topdir/pyratbay/pbay.py -c mcmc_hatp01b.cfg
-
 cd $topdir/run03_HATP11b
 python $topdir/pyratbay/pbay.py -c mcmc_hatp11b.cfg
-
-cd $topdir/run04_HATP12b
-python $topdir/pyratbay/pbay.py -c mcmc_hatp12b.cfg
-
-cd $topdir/run05_HATP26b
-python $topdir/pyratbay/pbay.py -c mcmc_hatp26b.cfg
-
-cd $topdir/run06_WASP006b
-python $topdir/pyratbay/pbay.py -c mcmc_wasp006b.cfg
-
-cd $topdir/run07_WASP012b
-python $topdir/pyratbay/pbay.py -c mcmc_wasp012b.cfg
-
-cd $topdir/run08_WASP017b
-python $topdir/pyratbay/pbay.py -c mcmc_wasp017b.cfg
-
-cd $topdir/run09_WASP019b
-python $topdir/pyratbay/pbay.py -c mcmc_wasp019b.cfg
-
-cd $topdir/run10_WASP031b
-python $topdir/pyratbay/pbay.py -c mcmc_wasp031b.cfg
-
-cd $topdir/run11_WASP039b
-python $topdir/pyratbay/pbay.py -c mcmc_wasp039b.cfg
-
-cd $topdir/run15_WASP121b
-python $topdir/pyratbay/pbay.py -c mcmc_wasp121b.cfg
-
 
 # Figure 3:
 cd $topdir/run01/
