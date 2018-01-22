@@ -5,13 +5,13 @@ topdir=`pwd`
 cd $topdir
 git clone --recursive https://github.com/pcubillos/pyratbay
 cd $topdir/pyratbay
-git checkout cea5ca0  # FINDME: Update when final
+git checkout 8198c1e
 make
 
 cd $topdir
 git clone https://github.com/pcubillos/repack
 cd $topdir/repack
-git checkout 4ba3633  # FINDME: Update when final
+git checkout 4ba3633
 make
 
 # Generate filter files:
@@ -84,13 +84,52 @@ python $topdir/pyratbay/pbay.py -c opacity_nominal_1.0-5.5um.cfg
 
 
 # Run MCMC transmission retrievals:
-cd $topdir/run02_HATP01b/
-python $topdir/pyratbay/pbay.py -c mcmc_hatp01b.cfg
+cd $topdir/run02_HATP11b
+python $topdir/pyratbay/pbay.py -c mcmc_hatp11b_w0-00000-c.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_hatp11b_wm-00000-0.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_hatp11b_wm-00000-c.cfg
 
+cd $topdir/run03_HATP32b
+python $topdir/pyratbay/pbay.py -c mcmc_hatp32b_w0-00000-c.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_hatp32b_wm-00000-0.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_hatp32b_wm-00000-c.cfg
 
-# Run transmission retrievals:
-cd $topdir/run03_HATP11b
-python $topdir/pyratbay/pbay.py -c mcmc_hatp11b.cfg
+cd $topdir/run04_HATP38b
+python $topdir/pyratbay/pbay.py -c mcmc_hatp38b_w0-00000-c.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_hatp38b_wm-00000-0.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_hatp38b_wm-00000-c.cfg
+
+cd $topdir/run05_WASP043b
+python $topdir/pyratbay/pbay.py -c mcmc_wasp043b_w0-00000-c.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp043b_w0-000h0-c.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp043b_wm-00000-0.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp043b_wm-00000-c.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp043b_wm-000h0-0.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp043b_wm-000h0-c.cfg
+
+cd $topdir/run06_WASP063b
+python $topdir/pyratbay/pbay.py -c mcmc_wasp063b_w0-00000-c.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp063b_w0-000h0-c.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp063b_wm-00000-0.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp063b_wm-00000-c.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp063b_wm-000h0-0.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp063b_wm-000h0-c.cfg
+
+cd $topdir/run07_WASP067b
+python $topdir/pyratbay/pbay.py -c mcmc_wasp067b_w0-00000-c.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp067b_wm-00000-0.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp067b_wm-00000-c.cfg
+
+cd $topdir/run08_WASP101b
+python $topdir/pyratbay/pbay.py -c mcmc_wasp101b_w0-00000-c.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp101b_wm-00000-0.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp101b_wm-00000-c.cfg
+
+cd $topdir/run09_WASP107b
+python $topdir/pyratbay/pbay.py -c mcmc_wasp107b_w0-00000-c.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp107b_wm-00000-0.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp107b_wm-00000-c.cfg
+
 
 # Figure 3:
 cd $topdir/run01/
