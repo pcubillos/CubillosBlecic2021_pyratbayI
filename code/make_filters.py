@@ -98,7 +98,7 @@ if __name__ == "__main__":
         if (k+1) % 5 == 0 and k != 0:
           data  += "\n         "
           error += "\n         "
-        filters += "\n         {:s}".format(ffile)
+        filters += "         {:s}\n".format(ffile)
         k += 1
 
     print(planet)
