@@ -5,7 +5,7 @@ topdir=`pwd`
 cd $topdir
 git clone --recursive https://github.com/pcubillos/pyratbay
 cd $topdir/pyratbay
-git checkout 8198c1e
+git checkout 7bf813d
 make
 
 cd $topdir
@@ -81,6 +81,11 @@ python $topdir/pyratbay/pbay.py -c atm_uniform.cfg
 # Make nominal opacity file (H2O CO CO2 CH4 HCN NH3):
 cd $topdir/run01/
 python $topdir/pyratbay/pbay.py -c opacity_nominal_1.0-5.5um.cfg
+
+
+# Flat-curve fit to the data:
+cd $topdir/code/
+python $topdir/code/flatfit.py > flatfit.dat
 
 
 # Run MCMC transmission retrievals:
