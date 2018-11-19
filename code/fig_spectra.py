@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+
 import sys
 import os
 import numpy as np
@@ -7,7 +8,7 @@ import matplotlib.pyplot as plt
 import scipy.constants   as sc
 import ConfigParser as configparser
 from scipy.ndimage.filters import gaussian_filter1d as gaussf
-plt.ioff()
+#plt.ioff()
 
 # Edit the path to the Pyrat-Bay package if necessary:
 sys.path.append("../pyratbay")
@@ -185,9 +186,9 @@ for j in np.arange(nplanets):
     facecolor="orange", edgecolor="none", alpha=1.0)
   # Best fit and data:
   plt.plot(wl, f*gaussf(bmodel[j], sigma), color='r', lw=lw)
-  plt.plot(bandwl[j], f*bandfl[j], "o", color='orange', mew=0.15,
-           mec="0.25", ms=ms)
-  plt.errorbar(bandwl[j], f*data[j], uncert[j]*f, fmt="ob",
+  plt.plot(bandwl[j], f*bandfl[j], "o", color='orangered', mew=0.2,
+           mec="k", ms=ms)
+  plt.errorbar(bandwl[j], f*data[j], uncert[j]*f, fmt="o", color="blue",
                label="Data", ms=ms, mew=0, elinewidth=lw, capthick=lw,
                capsize=0, zorder=3)
   plt.xlim(1.0, 5.5)
@@ -218,3 +219,4 @@ for j in np.arange(nplanets):
   ax2.set_ylim(yran[j])
   ax2.locator_params(axis='y', nbins=7)
 plt.savefig("../plots/transmission.ps")
+plt.savefig("../plots/transmission.pdf")

@@ -20,54 +20,35 @@ $topdir/code/make_filters.py > $topdir/code/filter_info.txt
 
 # Download Exomol data:
 cd $topdir/inputs/opacity
-wget -i wget_exomol_NH3.txt
-wget -i wget_exomol_CH4.txt
 wget -i wget_exomol_HCN.txt
 
 # Download HITRAN/HITEMP data:
 cd $topdir/inputs/opacity
-wget --user=HITRAN --password=getdata -N -i wget_hitemp_H2O_CO2.txt
+wget --user=HITRAN --password=getdata -N -i wget_hitemp_H2O.txt
 unzip '*.zip'
 rm -f *.zip
 
-# Download CO data:
-cd $topdir/inputs/opacity
-wget http://iopscience.iop.org/0067-0049/216/1/15/suppdata/apjs504015_data.tar.gz
-tar -xvzf apjs504015_data.tar.gz
-rm -f apjs504015_data.tar.gz ReadMe Table_S1.txt Table_S2.txt \
-      Table_S3.txt Table_S6.par
-
 # Generate partition-function files for H2O and NH3:
 cd $topdir/run01
-python $topdir/code/pf_tips_H2O-NH3.py
+python $topdir/code/pf_tips_H2O.py
 
-# Generate partition-function files for HCN, CH4, and TiO:
+# Generate partition-function files for HCN:
 cd $topdir/run01
 python $topdir/pyratbay/scripts/PFformat_Exomol.py  \
        $topdir/inputs/opacity/1H-12C-14N__Harris.pf \
        $topdir/inputs/opacity/1H-13C-14N__Larner.pf
-python $topdir/pyratbay/scripts/PFformat_Exomol.py \
-       $topdir/inputs/opacity/12C-1H4__YT10to10.pf
-python $topdir/pyratbay/scripts/PFformat_Schwenke_TiO.py \
-       $topdir/inputs/opacity/tiopart.dat
 
 
 # Compress LBL databases:
 cd $topdir/run01
 python $topdir/repack/repack.py repack_H2O.cfg
 python $topdir/repack/repack.py repack_HCN.cfg
-python $topdir/repack/repack.py repack_NH3.cfg
-python $topdir/repack/repack.py repack_CH4.cfg
 
 
 # Make TLI files:
 cd $topdir/run01/
-python $topdir/pyratbay/pbay.py -c tli_hitemp_CO2.cfg
-python $topdir/pyratbay/pbay.py -c tli_Li_CO.cfg
 python $topdir/pyratbay/pbay.py -c tli_hitemp_H2O.cfg
 python $topdir/pyratbay/pbay.py -c tli_exomol_HCN.cfg
-python $topdir/pyratbay/pbay.py -c tli_exomol_NH3.cfg
-python $topdir/pyratbay/pbay.py -c tli_exomol_CH4.cfg
 
 
 # Make atmospheric files:
@@ -80,7 +61,9 @@ python $topdir/pyratbay/pbay.py -c atm_uniform.cfg
 
 # Make nominal opacity file (H2O CO CO2 CH4 HCN NH3):
 cd $topdir/run01/
-python $topdir/pyratbay/pbay.py -c opacity_nominal_1.0-5.5um.cfg
+python $topdir/pyratbay/pbay.py -c opacity_H2O_1.0-2.0um.cfg
+python $topdir/pyratbay/pbay.py -c opacity_H2O_1.0-5.5um.cfg
+python $topdir/pyratbay/pbay.py -c opacity_H2O-HCN_1.0-2.0um.cfg
 
 
 # Flat-curve fit to the data:
@@ -106,17 +89,15 @@ python $topdir/pyratbay/pbay.py -c mcmc_hatp38b_wm-00000-c.cfg
 
 cd $topdir/run05_WASP043b
 python $topdir/pyratbay/pbay.py -c mcmc_wasp043b_w0-00000-c.cfg
-python $topdir/pyratbay/pbay.py -c mcmc_wasp043b_w0-000h0-c.cfg
 python $topdir/pyratbay/pbay.py -c mcmc_wasp043b_wm-00000-0.cfg
 python $topdir/pyratbay/pbay.py -c mcmc_wasp043b_wm-00000-c.cfg
-python $topdir/pyratbay/pbay.py -c mcmc_wasp043b_wm-000h0-0.cfg
-python $topdir/pyratbay/pbay.py -c mcmc_wasp043b_wm-000h0-c.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp043b_w0-000h0-c.cfg
 
 cd $topdir/run06_WASP063b
 python $topdir/pyratbay/pbay.py -c mcmc_wasp063b_w0-00000-c.cfg
-python $topdir/pyratbay/pbay.py -c mcmc_wasp063b_w0-000h0-c.cfg
 python $topdir/pyratbay/pbay.py -c mcmc_wasp063b_wm-00000-0.cfg
 python $topdir/pyratbay/pbay.py -c mcmc_wasp063b_wm-00000-c.cfg
+python $topdir/pyratbay/pbay.py -c mcmc_wasp063b_w0-000h0-c.cfg
 python $topdir/pyratbay/pbay.py -c mcmc_wasp063b_wm-000h0-0.cfg
 python $topdir/pyratbay/pbay.py -c mcmc_wasp063b_wm-000h0-c.cfg
 

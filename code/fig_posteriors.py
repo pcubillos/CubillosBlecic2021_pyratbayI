@@ -1,12 +1,14 @@
 #! /usr/bin/env python
+
 import sys
 import os
 import copy
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from scipy.ndimage.filters import gaussian_filter1d as gaussf
 import ConfigParser as configparser
-#plt.ioff()
+plt.ioff()
 
 sys.path.append("../pyratbay")
 import pyratbay as pb
@@ -105,7 +107,7 @@ iC2H2 = np.where(spec == 'C2H2')[0][0]
 iC2H4 = np.where(spec == 'C2H4')[0][0]
 
 # This index sets the planet:
-i = 5
+i = 2
 
 nruns = len(cfiles[i])
 nparams = 12
@@ -221,7 +223,7 @@ ranges = [
  [[ 300, 1000], [0.415,0.445], [-6.5, 0],         [-2,  4.0], [-5,2]],   # H11
  [[ 300, 2750], [1.68, 1.86],  [-6.2, 0],         [-2,  3.0], [-6,2]],   # H32
  [[ 300, 1500], [0.79, 0.88],  [-9.0, 0],         [-2,  3.0], [-6,2]],   # H38
- [[ 300, 1500], [0.944,0.955], [-6.5, 0], [-9,0], [-2,  3.5], [-5.5,2]], # W43
+ [[ 300, 1500], [1.048,1.062], [-6.5, 0], [-9,0], [-2,  3.5], [-5.5,2]], # W43
  [[ 300, 3000], [1.32, 1.48],  [-7.0, 0], [-7,0], [-2, 3.5],  [-6.5,2]], # W63
  [[ 300, 3000], [1.22, 1.42],  [-9.0, 0],         [-1.8,3.8], [-8,2]],   # W67
  [[ 300, 3000], [1.12, 1.43],  [-9.0, 0],         [-2,  4.0], [-8,2]],   # W101
@@ -239,7 +241,7 @@ ticks = [
   [[300, 600, 900, 1200, 1500], [0.8, 0.82, 0.84, 0.86, 0.88], [-8,-6,-4,-2,0],
    [-1, 0, 1, 2], [-6, -4, -2, 0, 2]],
   # WASP043
-  [[ 300, 700, 1100, 1500], [0.945, 0.948, 0.951, 0.954], [-6, -3, 0],
+  [[ 300, 700, 1100, 1500], [1.05, 1.055, 1.06], [-6, -3, 0],
    [-9, -6, -3, -0], [-1, 1, 3], [-4, -2, 0, 2]],
   # WASP063
   [[ 300, 1200, 2100, 3000], [1.35, 1.4, 1.45], [-6, -3, 0],
@@ -346,3 +348,4 @@ for k in np.arange(nbfree-1):
       axp[k][l].set_xticks(pticks[i][np.where(ifree)[0][k]])
       axp[k][l].set_yticks(pticks[i][np.where(ifree)[0][l+1]])
 plt.savefig("../plots/posterior_{:s}.ps".format(planet))
+plt.savefig("../plots/posterior_{:s}.pdf".format(planet))
