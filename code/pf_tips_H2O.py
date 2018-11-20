@@ -10,6 +10,3 @@ temp = np.linspace(70, 3000, 294)
 
 molname = "H2O"
 p.to_file("./PF_tips_H2O.dat", molname, temp)
-
-molname = "NH3"
-p.to_file("./PF_tips_NH3.dat", molname, temp)

@@ -18,21 +18,21 @@ make
 cd $topdir/code
 $topdir/code/make_filters.py > $topdir/code/filter_info.txt
 
-# Download Exomol data:
+# Download HCN Exomol data:
 cd $topdir/inputs/opacity
 wget -i wget_exomol_HCN.txt
 
-# Download HITRAN/HITEMP data:
+# Download H2O HITEMP data:
 cd $topdir/inputs/opacity
 wget --user=HITRAN --password=getdata -N -i wget_hitemp_H2O.txt
 unzip '*.zip'
 rm -f *.zip
 
-# Generate partition-function files for H2O and NH3:
+# Generate partition-function file for H2O:
 cd $topdir/run01
 python $topdir/code/pf_tips_H2O.py
 
-# Generate partition-function files for HCN:
+# Generate partition-function file for HCN:
 cd $topdir/run01
 python $topdir/pyratbay/scripts/PFformat_Exomol.py  \
        $topdir/inputs/opacity/1H-12C-14N__Harris.pf \
@@ -53,13 +53,9 @@ python $topdir/pyratbay/pbay.py -c tli_exomol_HCN.cfg
 
 # Make atmospheric files:
 cd $topdir/run01/
-python $topdir/pyratbay/pbay.py -c atm_1xsolar_1000K.cfg
-python $topdir/pyratbay/pbay.py -c atm_1xsolar_1500K.cfg
-python $topdir/pyratbay/pbay.py -c atm_1xsolar_2000K.cfg
-python $topdir/pyratbay/pbay.py -c atm_1xsolar_2500K.cfg
 python $topdir/pyratbay/pbay.py -c atm_uniform.cfg
 
-# Make nominal opacity file (H2O CO CO2 CH4 HCN NH3):
+# Make opacity files:
 cd $topdir/run01/
 python $topdir/pyratbay/pbay.py -c opacity_H2O_1.0-2.0um.cfg
 python $topdir/pyratbay/pbay.py -c opacity_H2O_1.0-5.5um.cfg
