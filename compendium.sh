@@ -2,58 +2,64 @@
 topdir=`pwd`
 
 # Clone (download) the necessary code:
-cd $topdir
-git clone --recursive https://github.com/pcubillos/pyratbay
-cd $topdir/pyratbay
-git checkout 7bf813d
-make
-
-cd $topdir
-git clone https://github.com/pcubillos/repack
-cd $topdir/repack
-git checkout 4ba3633
-make
+pip install pyratbay>=0.9.0
+pip install mc3>=3.0.0
+pip install lbl-repack>=1.3.0
 
 # Generate filter files:
 cd $topdir/code
-$topdir/code/make_filters.py > $topdir/code/filter_info.txt
+python make_filters.py > filter_info.txt
 
 # Download HCN Exomol data:
 cd $topdir/inputs/opacity
 wget -i wget_exomol_HCN.txt
+wget -i wget_exomol_H2O.txt
 
 # Download H2O HITEMP data:
 cd $topdir/inputs/opacity
 wget --user=HITRAN --password=getdata -N -i wget_hitemp_H2O.txt
+wget --user=HITRAN --password=getdata -N -i wget_hitemp_CO2.txt
 unzip '*.zip'
 rm -f *.zip
+
+# Download CO data:
+cd $topdir/inputs/opacity
+wget http://iopscience.iop.org/0067-0049/216/1/15/suppdata/apjs504015_data.tar.gz
+tar xf apjs504015_data.tar.gz
+rm -f apjs504015_data.tar.gz ReadMe Table_S1.txt Table_S2.txt \
+      Table_S3.txt Table_S4.txt Table_S6.par
+
 
 # Generate partition-function file for H2O:
 cd $topdir/run01
 python $topdir/code/pf_tips_H2O.py
+#pbay -pf tips H2O
 
 # Generate partition-function file for HCN:
 cd $topdir/run01
-python $topdir/pyratbay/scripts/PFformat_Exomol.py  \
-       $topdir/inputs/opacity/1H-12C-14N__Harris.pf \
-       $topdir/inputs/opacity/1H-13C-14N__Larner.pf
+pbay -pf exomol $topdir/inputs/opacity/1H-12C-14N__Harris.pf \
+                $topdir/inputs/opacity/1H-13C-14N__Larner.pf
+pbay -pf exomol $topdir/inputs/opacity/1H2-16O__POKAZATEL.pf
 
 
 # Compress LBL databases:
 cd $topdir/run01
-python $topdir/repack/repack.py repack_H2O.cfg
-python $topdir/repack/repack.py repack_HCN.cfg
+repack repack_hitemp_H2O.cfg
+repack repack_exomol_H2O.cfg
+repack repack_HCN.cfg
 
 
 # Make TLI files:
 cd $topdir/run01/
-python $topdir/pyratbay/pbay.py -c tli_hitemp_H2O.cfg
-python $topdir/pyratbay/pbay.py -c tli_exomol_HCN.cfg
-
+pbay -c tli_hitemp_H2O.cfg
+pbay -c tli_exomol_H2O.cfg
+pbay -c tli_exomol_HCN.cfg
+pbay -c tli_Li_CO.cfg
+pbay -c tli_hitemp_CO2.cfg
 
 # Make atmospheric files:
 cd $topdir/run01/
-python $topdir/pyratbay/pbay.py -c atm_uniform.cfg
+pbay -c atm_uniform.cfg
 
 # Make opacity files:
 cd $topdir/run01/
