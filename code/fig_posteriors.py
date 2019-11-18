@@ -10,12 +10,11 @@ from scipy.ndimage.filters import gaussian_filter1d as gaussf
 import ConfigParser as configparser
 plt.ioff()
 
-sys.path.append("../pyratbay")
 import pyratbay as pb
 import pyratbay.constants  as pc
 import pyratbay.atmosphere as pa
+import pyratbay.io as io
 
-sys.path.append('../pyratbay/modules/MCcubed/')
 import MCcubed.plots as mp
 
 
@@ -95,16 +94,25 @@ cfiles = [
 Zsun = 0.0134
 Xsun = 0.7381
 # Indices for species in atmosphere:
-spec, p, t, q = pa.readatm("../run01/isothermal_1500K_uniform.atm")
-iHe   = np.where(spec == 'He')[0][0]
-iH2   = np.where(spec == 'H2')[0][0]
-iH    = np.where(spec == 'H')[0][0]
-iH2O  = np.where(spec == 'H2O')[0][0]
-iCH4  = np.where(spec == 'CH4')[0][0]
-iHCN  = np.where(spec == 'HCN')[0][0]
-iNH3  = np.where(spec == 'NH3')[0][0]
-iC2H2 = np.where(spec == 'C2H2')[0][0]
-iC2H4 = np.where(spec == 'C2H4')[0][0]
+units, specs, p, t, q, r = io.read_atm("../run01/isothermal_1500K_uniform.atm")
+iHe   = np.where(specs == 'He')[0][0]
+iH2   = np.where(specs == 'H2')[0][0]
+iH    = np.where(specs == 'H')[0][0]
+iH2O  = np.where(specs == 'H2O')[0][0]
+iCH4  = np.where(specs == 'CH4')[0][0]
+iHCN  = np.where(specs == 'HCN')[0][0]
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Checking metallicity of an atmosphere
+m_He = 4.002602
+m_H = 1.00794
+mu = pa.meanweight(q, specs)[0]
+Y = m_He * q[0,iHe]
+X = m_H  * (2*q[0,iH2] + q[0,iH] + 4*q[0,iH2O] + q[0,iHCN] + 3*q[0,iCH4])
+Z = mu - X - Y
+MH = np.log10(Z/X / (Zsun/Xsun))
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 
 # This index sets the planet:
 i = 2
@@ -114,68 +122,67 @@ nparams = 12
 freep = np.zeros(nparams, bool)
 posterior, pnames = [], []
 
+mass = pyrat.mol.mass
+
 # Read MCMC results:
 for j in np.arange(nruns):
-  path = os.path.dirname(cfiles[i][j]) + "/"
-  config = configparser.SafeConfigParser()
-  config.read([cfiles[i][j]])
-  # Burned-in posterior sample:
-  rootname = config.get('pyrat','logfile').replace('.log','')
-  planet = rootname.split("_")[1]
-  savefile = rootname + '.npz'
-  burn = (config.getint('pyrat','burnin') * config.getint('pyrat','nchains')
-         / config.getint('pyrat','thinning'))
-  post = np.load(path+savefile)["Z"]
-  posterior.append(post[burn:])
-  # Open Pyrat Object:
-  log = open("dummy.log", "w")  # Avoid overwriting the log file
-  pyrat = pb.pyrat.init(cfiles[i][j], log=log)
-  spec  = pyrat.mol.name
-  q     = pyrat.atm.q
-  freep |= pyrat.ret.stepsize > 0
+    path = os.path.dirname(cfiles[i][j]) + "/"
+    config = configparser.SafeConfigParser()
+    config.read([cfiles[i][j]])
+    # Burned-in posterior sample:
+    rootname = config.get('pyrat','logfile').replace('.log','')
+    planet = rootname.split("_")[1]
+    savefile = rootname + '.npz'
+    burn = (config.getint('pyrat','burnin') * config.getint('pyrat','nchains')
+           / config.getint('pyrat','thinning'))
+    post = np.load(path+savefile)["Z"]
+    posterior.append(post[burn:])
+    # Open Pyrat Object:
+    log = open("dummy.log", "w")  # Avoid overwriting the log file
+    pyrat = pb.pyrat.init(cfiles[i][j], log=log)
+    spec  = pyrat.mol.name
+    q     = pyrat.atm.q
+    freep |= pyrat.ret.stepsize > 0
 
-  posterior[j][:,pyrat.ret.irad] *= pc.km/pc.rjup
-  parname = np.asarray(pyrat.ret.parname, "|S100")
-  pnames.append(parname[pyrat.ret.stepsize>0])
-  ifree = np.where(pyrat.ret.stepsize>0)[0]
-  if 'N2' in np.array(pyrat.ret.molscale)[np.in1d(pyrat.ret.iabund, ifree)]:
-    # Unique posterior values:
-    u, uind, uinv = np.unique(posterior[j][:,0], return_index=True,
-                              return_inverse=True)
-    nunique = np.size(u)
-    # Get mean molecular mass:
-    mu = np.zeros(nunique, np.double)
-    X  = np.zeros(nunique, np.double)
-    Z  = np.zeros(nunique, np.double)
-    params = pyrat.ret.params
-    imol = np.intersect1d(ifree, pyrat.ret.iabund)
-    for k in np.arange(nunique):
-      idx = uind[k]  # Sample index
-      params[imol] = posterior[j][idx, np.in1d(ifree, pyrat.ret.iabund)]
-      q2 = pa.qscale(q, spec, params[pyrat.ret.iabund],
-            pyrat.ret.molscale, bulk=pyrat.ret.bulk, iscale=pyrat.ret.iscale,
-            ibulk=pyrat.ret.ibulk, bratio=pyrat.ret.bulkratio,
-            invsrat=pyrat.ret.invsrat)
-      mu[k] = pa.meanweight(q2, spec)[0]
-      Y    =    q2[0,iHe]  *pyrat.mol.mass[iHe]
-      X[k] = (2*q2[0,iH2]  *pyrat.mol.mass[iH]
-             +  q2[0,iH]   *pyrat.mol.mass[iH]
-             +4*q2[0,iH2O] *pyrat.mol.mass[iH]
-             +  q2[0,iHCN] *pyrat.mol.mass[iH]
-             +3*q2[0,iCH4] *pyrat.mol.mass[iH]
-             +2*q2[0,iC2H2]*pyrat.mol.mass[iH]
-             +4*q2[0,iC2H4]*pyrat.mol.mass[iH])
-      Z[k] = mu[k] - X[k] - Y  # X + Y + Z = mu
-      if (k+1) % (nunique/10) == 0:
-        print("{:3.0f}% done.".format(k*100.0/nunique))
-    mmm = mu[uinv]
-    # Metallicity by mass with respect to solar values, i.e., [M/H]:
-    MH = np.log10(Z/X / (Zsun/Xsun))
-    MH = MH[uinv]
+    posterior[j][:,pyrat.ret.irad] *= pc.km/pc.rjup
+    parname = np.asarray(pyrat.ret.parname, "|S100")
+    pnames.append(parname[pyrat.ret.stepsize>0])
+    ifree = np.where(pyrat.ret.stepsize>0)[0]
+    if 'N2' in np.array(pyrat.ret.molscale)[np.in1d(pyrat.ret.iabund, ifree)]:
+        # Unique posterior values:
+        u, uind, uinv = np.unique(posterior[j][:,0], return_index=True,
+                                  return_inverse=True)
+        nunique = np.size(u)
+        # Get mean molecular mass:
+        mu = np.zeros(nunique, np.double)
+        X  = np.zeros(nunique, np.double)
+        Z  = np.zeros(nunique, np.double)
+        params = pyrat.ret.params
+        imol = np.intersect1d(ifree, pyrat.ret.iabund)
+        for k in np.arange(nunique):
+            idx = uind[k]  # Sample index
+            params[imol] = posterior[j][idx, np.in1d(ifree, pyrat.ret.iabund)]
+            q2 = pa.qscale(q, spec, params[pyrat.ret.iabund],
+                pyrat.ret.molscale, bulk=pyrat.ret.bulk,
+                iscale=pyrat.ret.iscale, ibulk=pyrat.ret.ibulk,
+                bratio=pyrat.ret.bulkratio, invsrat=pyrat.ret.invsrat)
+            mu[k] = pa.meanweight(q2, spec)[0]
+            Y = mass[iHe] * q2[0,iHe]
+            X[k] = mass[iH] * (2*q2[0,iH2]  +   q2[0,iH]
+                             + 4*q2[0,iH2O] +   q2[0,iHCN]
+                             + 3*q2[0,iCH4] + 2*q2[0,iC2H2]
+                             + 4*q2[0,iC2H4])
+            Z[k] = mu[k] - X[k] - Y  # X + Y + Z = mu
+            if (k+1) % (nunique/10) == 0:
+              print("{:3.0f}% done.".format(k*100.0/nunique))
+        mmm = mu[uinv]
+        # Metallicity by mass with respect to solar values, i.e., [M/H]:
+        MH = np.log10(Z/X / (Zsun/Xsun))
+        MH = MH[uinv]
 
-    iN2 = np.where(ifree==pyrat.ret.iabund[pyrat.ret.molscale.index('N2')])
-    iN2 = iN2[0][0]
-    posterior[j][:,iN2] = MH
+        iN2 = np.where(ifree==pyrat.ret.iabund[pyrat.ret.molscale.index('N2')])
+        iN2 = iN2[0][0]
+        posterior[j][:,iN2] = MH
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

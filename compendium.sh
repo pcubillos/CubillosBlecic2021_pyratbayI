@@ -32,8 +32,7 @@ rm -f apjs504015_data.tar.gz ReadMe Table_S1.txt Table_S2.txt \
 
 # Generate partition-function file for H2O:
 cd $topdir/run01
-python $topdir/code/pf_tips_H2O.py
-#pbay -pf tips H2O
+pbay -pf tips H2O
 
 # Generate partition-function file for HCN:
 cd $topdir/run01
