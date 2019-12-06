@@ -10,14 +10,13 @@ pip install lbl-repack>=1.3.0
 cd $topdir/code
 python make_filters.py > filter_info.txt
 
-# Download HCN Exomol data:
+# Download Exomol data:
 cd $topdir/inputs/opacity
 wget -i wget_exomol_HCN.txt
 wget -i wget_exomol_H2O.txt
 
-# Download H2O HITEMP data:
+# Download HITEMP data:
 cd $topdir/inputs/opacity
-wget --user=HITRAN --password=getdata -N -i wget_hitemp_H2O.txt
 wget --user=HITRAN --password=getdata -N -i wget_hitemp_CO2.txt
 unzip '*.zip'
 rm -f *.zip
@@ -30,10 +29,6 @@ rm -f apjs504015_data.tar.gz ReadMe Table_S1.txt Table_S2.txt \
       Table_S3.txt Table_S4.txt Table_S6.par
 
 
-# Generate partition-function file for H2O:
-cd $topdir/run01
-pbay -pf tips H2O
-
 # Generate partition-function file for HCN:
 cd $topdir/run01
 pbay -pf exomol $topdir/inputs/opacity/1H-12C-14N__Harris.pf \
@@ -43,14 +38,12 @@ pbay -pf exomol $topdir/inputs/opacity/1H2-16O__POKAZATEL.pf
 
 # Compress LBL databases:
 cd $topdir/run01
-repack repack_hitemp_H2O.cfg
 repack repack_exomol_H2O.cfg
 repack repack_HCN.cfg
 
 
 # Make TLI files:
 cd $topdir/run01/
-pbay -c tli_hitemp_H2O.cfg
 pbay -c tli_exomol_H2O.cfg
 pbay -c tli_exomol_HCN.cfg
 pbay -c tli_Li_CO.cfg
@@ -62,9 +55,8 @@ pbay -c atm_uniform.cfg
 
 # Make opacity files:
 cd $topdir/run01/
-python $topdir/pyratbay/pbay.py -c opacity_H2O_1.0-2.0um.cfg
-python $topdir/pyratbay/pbay.py -c opacity_H2O_1.0-5.5um.cfg
-python $topdir/pyratbay/pbay.py -c opacity_H2O-HCN_1.0-2.0um.cfg
+pbay -c opacity_H2O_1.0-5.5um.cfg
+pbay -c opacity_HCN_1.0-5.5um.cfg
 
 
 # Flat-curve fit to the data:
