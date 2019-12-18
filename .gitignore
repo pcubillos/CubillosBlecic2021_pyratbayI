@@ -12,6 +12,12 @@ code/filter_info.txt
 *.atm
 *.swp
 
+# Ignore everything in planet directories:
+run_*/*
+# Except these files
+!run_*/*.cfg
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
