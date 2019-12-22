@@ -29,7 +29,7 @@ rm -f apjs504015_data.tar.gz ReadMe Table_S1.txt Table_S2.txt \
       Table_S3.txt Table_S4.txt Table_S6.par
 
 
-# Generate partition-function file for HCN:
+# Generate partition-function files:
 cd $topdir/run01
 pbay -pf exomol $topdir/inputs/opacity/1H-12C-14N__Harris.pf \
                 $topdir/inputs/opacity/1H-13C-14N__Larner.pf
@@ -57,6 +57,8 @@ pbay -c atm_uniform.cfg
 cd $topdir/run01/
 pbay -c opacity_H2O_1.0-5.5um.cfg
 pbay -c opacity_HCN_1.0-5.5um.cfg
+pbay -c opacity_CO2_1.0-5.5um.cfg
+pbay -c opacity_CO_1.0-5.5um.cfg
 
 
 # Flat-curve fit to the data:
