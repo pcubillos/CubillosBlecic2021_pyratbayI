@@ -7,13 +7,14 @@ pip install mc3>=3.0.0
 pip install lbl-repack>=1.3.0
 
 # Generate filter files:
-cd $topdir/code
-python make_filters.py
+cd $topdir
+python code/make_filters.py
 
 # Download Exomol data:
 cd $topdir/inputs/opacity
 wget -i wget_exomol_HCN.txt
 wget -i wget_exomol_H2O.txt
+wget -i wget_exomol_CH4.txt
 
 # Download HITEMP data:
 cd $topdir/inputs/opacity
@@ -34,18 +35,19 @@ cd $topdir/run01
 pbay -pf exomol $topdir/inputs/opacity/1H-12C-14N__Harris.pf \
                 $topdir/inputs/opacity/1H-13C-14N__Larner.pf
 pbay -pf exomol $topdir/inputs/opacity/1H2-16O__POKAZATEL.pf
-
+pbay -pf exomol $topdir/inputs/opacity/12C-1H4__YT10to10.pf
 
 # Compress LBL databases:
 cd $topdir/run01
 repack repack_exomol_H2O.cfg
-repack repack_HCN.cfg
-
+repack repack_exomol_HCN.cfg
+repack repack_exomol_CH4.cfg
 
 # Make TLI files:
 cd $topdir/run01/
 pbay -c tli_exomol_H2O.cfg
 pbay -c tli_exomol_HCN.cfg
+pbay -c tli_exomol_CH4.cfg
 pbay -c tli_Li_CO.cfg
 pbay -c tli_hitemp_CO2.cfg
 
