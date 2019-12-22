@@ -8,7 +8,7 @@ pip install lbl-repack>=1.3.0
 
 # Generate filter files:
 cd $topdir/code
-python make_filters.py > filter_info.txt
+python make_filters.py
 
 # Download Exomol data:
 cd $topdir/inputs/opacity
