@@ -32,10 +32,10 @@ rm -f apjs504015_data.tar.gz ReadMe Table_S1.txt Table_S2.txt \
 
 # Generate partition-function files:
 cd $topdir/run01
-pbay -pf exomol $topdir/inputs/opacity/1H-12C-14N__Harris.pf \
-                $topdir/inputs/opacity/1H-13C-14N__Larner.pf
-pbay -pf exomol $topdir/inputs/opacity/1H2-16O__POKAZATEL.pf
-pbay -pf exomol $topdir/inputs/opacity/12C-1H4__YT10to10.pf
+pbay -pf exomol ../inputs/opacity/1H-12C-14N__Harris.pf \
+                ../inputs/opacity/1H-13C-14N__Larner.pf
+pbay -pf exomol ../inputs/opacity/1H2-16O__POKAZATEL.pf
+pbay -pf exomol ../inputs/opacity/12C-1H4__YT10to10.pf
 
 # Compress LBL databases:
 cd $topdir/run01
