@@ -59,6 +59,7 @@ pbay -c atm_uniform.cfg
 cd $topdir/run01/
 pbay -c opacity_H2O_1.0-5.5um.cfg
 pbay -c opacity_HCN_1.0-5.5um.cfg
+pbay -c opacity_CH4_1.0-5.5um.cfg
 pbay -c opacity_CO2_1.0-5.5um.cfg
 pbay -c opacity_CO_1.0-5.5um.cfg
 
