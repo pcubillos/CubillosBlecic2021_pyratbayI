@@ -4,7 +4,7 @@ topdir=`pwd`
 # Clone (download) the necessary code:
 pip install mc3>=3.0.0
 pip install pyratbay>=0.9.0a3
-pip install lbl-repack>=1.4.1
+#pip install lbl-repack>=1.4.1
 
 # Install petitRADTRANS:
 # TBD
@@ -19,12 +19,6 @@ pythonsetup.py develop
 cd $topdir
 python code/make_filters.py
 
-# Download Exomol data:
-#cd $topdir/inputs/opacity
-#wget -i wget_exomol_HCN.txt
-#wget -i wget_exomol_H2O.txt
-#wget -i wget_exomol_CH4.txt
-
 # Download exomol repack data:
 # TBD
 
@@ -38,15 +32,11 @@ rm -f *.zip
 cd $topdir/inputs/opacity
 wget https://hitran.org/hitemp/data/bzip2format/05_HITEMP2019.par.bz2
 bzip2 -d 05_HITEMP2019.par.bz2
-#wget http://iopscience.iop.org/0067-0049/216/1/15/suppdata/apjs504015_data.tar.gz
-#tar xf apjs504015_data.tar.gz
-#rm -f apjs504015_data.tar.gz ReadMe Table_S1.txt Table_S2.txt \
-#      Table_S3.txt Table_S4.txt Table_S6.par
 
-# Download the HITRAN CIA data:
+# Download and format HITRAN CIA data:
 cd $topdir/inputs/opacity
-wget --user=HITRAN --password=getdata -N https://www.cfa.harvard.edu/HITRAN/HITRAN2012/CIA/Main-Folder/H2-H2/H2-H2_2011.cia
-
+wget https://hitran.org/data/CIA/H2-H2_2011.cia
+cd $topdir/run_setup
 pbay -cs hitran ../inputs/opacity/H2-H2_2011.cia 2 10
 
 # Generate partition-function files:
@@ -56,19 +46,13 @@ pbay -pf exomol ../inputs/opacity/1H-12C-14N__Harris.pf \
 pbay -pf exomol ../inputs/opacity/1H2-16O__POKAZATEL.pf
 pbay -pf exomol ../inputs/opacity/12C-1H4__YT10to10.pf
 
-# Compress LBL databases:
-#cd $topdir/run_setup
-#repack repack_exomol_H2O.cfg
-#repack repack_exomol_HCN.cfg
-#repack repack_exomol_CH4.cfg
-
 # Make TLI files:
 cd $topdir/run_setup
 pbay -c tli_hitemp_CO.cfg
 pbay -c tli_exomol_H2O.cfg
 pbay -c tli_hitemp_CO2.cfg
-#pbay -c tli_exomol_HCN.cfg
-#pbay -c tli_exomol_CH4.cfg
+pbay -c tli_exomol_CH4.cfg
+pbay -c tli_exomol_HCN.cfg
 
 # Make atmospheric files:
 cd $topdir/run_setup
@@ -85,6 +69,11 @@ pbay -c opacity_CO_1.0-5.5um.cfg
 # Opacity comparison:
 cd $topdir/run_validation_opacities
 python ../code/fig_validation_opacities.py
+
+# Forward-model comparison:
+cd $topdir/run_validation_forward_model
+python ../code/fig_validation_forward_model.py
+
 
 # Flat-curve fit to the data:
 cd $topdir/code/
