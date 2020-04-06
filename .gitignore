@@ -11,6 +11,7 @@ code/filter_info.txt
 *.tli
 *.atm
 *.swp
+*~
 
 # Ignore everything in planet directories:
 run_*/*
