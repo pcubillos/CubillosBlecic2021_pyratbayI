@@ -42,17 +42,13 @@ pyrat = pb.run('H2O_spectrum.cfg')
 wl_pyrat = 1.0/(pyrat.spec.wn*pc.um)
 ec_H2O = pyrat.ex.ec
 
-# CO:
 pyrat = pb.run('CO_spectrum.cfg')
-# Consider only the first isotope:
-pyrat.iso.ratio[1:] = 1e-30
+pyrat.iso.ratio[1:] = 1e-30  # Consider only the first isotope
 pyrat.run()
 ec_CO = pyrat.ex.ec
 
-# CO2:
 pyrat = pb.run('CO2_spectrum.cfg')
-# Consider only the first isotope:
-pyrat.iso.ratio[1:] = 1e-30
+pyrat.iso.ratio[1:] = 1e-30  # Consider only the first isotope
 pyrat.run()
 ec_CO2 = pyrat.ex.ec
 

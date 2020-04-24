@@ -29,15 +29,15 @@ def ticker(ax, xaxis=True, yaxis=True):
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Transmission model with only H2 Rayleigh and CIA opacity:
 
-nlayers = 28
+nlayers = 41
 T0 = 1300.0
-pressure = pa.pressure('1e-5 bar', '100 bar', 28)
+pressure = pa.pressure('1e-8 bar', '100 bar', nlayers)
 temperature = pa.tmodels.Isothermal(nlayers)(T0)
 
 species = 'H2  He  Na  K  H2O  CH4  CO  CO2'.split()
 q = [0.85, 0.1492, 3.0e-06, 1.0e-06, 4.0e-04, 1.0e-04, 3.0e-04, 1.0e-07]
 Q = pa.uniform(pressure, temperature, species, q)
-mu = pa.meanweight(Q, species)
+mu = pa.mean_weight(Q, species)
 
 iH2  = species.index('H2')
 iHe  = species.index('He')
@@ -83,8 +83,8 @@ io.write_atm('petit.atm', pressure, temperature, species, Q,
     punits='bar', runits='km')
 
 # Run pyratbay model (using the atmospheric file above as input):
-pyrat = pb.run('petit_spectrum_no_lbl.cfg')
-pyrat_wl = 1/(pyrat.spec.wn*pc.um)
+pyrat = pb.run('petit_spectrum_CIA-Rayleigh.cfg')
+pyrat_wl_no_lbl = 1/(pyrat.spec.wn*pc.um)
 # Transmission radius in Rjup units:
 pyrat_no_lbl = np.sqrt(pyrat.spec.spectrum) * pyrat.phy.rstar / pc.rjup
 
@@ -107,7 +107,8 @@ atmosphere.calc_transm(temperature, abundances, gravity, mu,
     R_pl=R_pl, P0_bar=P0_bar)
 petit_trans = atmosphere.transm_rad/pc.rjup
 
-pyrat = pb.run('petit_spectrum.cfg')
+pyrat = pb.run('petit_spectrum_H2O-CO.cfg')
+pyrat_wl = 1/(pyrat.spec.wn*pc.um)
 pyrat_trans = np.sqrt(pyrat.spec.spectrum) * pyrat.phy.rstar / pc.rjup
 
 
@@ -154,7 +155,7 @@ atmosphere.calc_flux(temp2, abundances, gravity, mu)
 petit_methane_emission = atmosphere.flux*pc.c
 
 # Run pyratbay model (emission and transmission):
-pyrat = pb.run('petit_spectrum_methane.cfg')
+pyrat = pb.run('petit_spectrum_CH4-Na-K.cfg')
 pyrat_wl = 1/(pyrat.spec.wn*pc.um)
 pyrat_methane = np.sqrt(pyrat.spec.spectrum) * pyrat.phy.rstar / pc.rjup
 pyrat.od.path = 'eclipse'
@@ -170,47 +171,44 @@ planck_cold = pb.starspec.bbflux(pyrat.spec.wn, np.amin(temp2))
 
 fs = 14
 xticks = [0.3, 0.6, 1, 2, 3, 6, 10]
-xran = 0.3, 10.0
-yrant = 0.983, 1.042
+xran = 0.5, 10.0
+yrant = 0.983, 1.046
 yrane = -2000, 95000
 
-plt.figure(324, (13,9))
+def boliler_plate(plt, ax):
+    plt.xscale('log')
+    plt.xlabel('Wavelength (microns)', fontsize=fs)
+    ax.tick_params(labelsize=fs-1)
+    ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax.set_xticks(xticks)
+    plt.gca().xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+    plt.xlim(0.5, 10)
+    ticker(ax)
+
+
+plt.figure(325, (13,9))
 plt.clf()
 plt.subplots_adjust(0.08, 0.07, 0.97, 0.99, hspace=0.18, wspace=0.22)
 ax = plt.subplot(221)
 plt.text(0.02, 0.92, 'H2O, CO, H2 Ray, H2-H2 CIA', fontsize=fs,
     transform=ax.transAxes)
-plt.plot(pyrat_wl, pyrat_no_lbl, c='navy')
+plt.plot(pyrat_wl_no_lbl, pyrat_no_lbl, c='navy')
 plt.plot(petit_wl, petit_no_lbl, c='darkorange', alpha=0.75)
-plt.plot(pyrat_wl, gaussf(pyrat_trans, 10), c='blue', label='pyratbay')
+plt.plot(1e4/pyrat.spec.wn, gaussf(pyrat_trans,12), c='blue', label='pyratbay')
 plt.plot(petit_wl, petit_trans, c='orange', label='petitRADTRANS', alpha=0.8)
-plt.xscale('log')
-plt.xlabel('Wavelength (microns)', fontsize=fs)
 plt.ylabel(r'Transit radius ($\rm R_{Jup}$)', fontsize=fs)
-plt.xlim(xran)
 plt.ylim(yrant)
-ax.tick_params(labelsize=fs-1)
-ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-ax.set_xticks(xticks)
-plt.gca().xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
 plt.legend(loc='lower right', fontsize=fs)
-ticker(ax)
+boliler_plate(plt, ax)
 ax = plt.subplot(223)
 plt.plot(pyrat_wl, planck_hot, c='0.5')
 plt.plot(pyrat_wl, planck_cold, c='0.5')
 plt.plot(pyrat_wl, gaussf(pyrat_emission, 10.0), c='blue')
 plt.plot(petit_wl, petit_emission, c='orange', alpha=0.75)
-plt.xscale('log')
-plt.xlabel('Wavelength (microns)', fontsize=fs)
 plt.ylabel(r'Planet flux (erg s$^{-1}$ cm$^{-2}$ cm)', fontsize=fs)
-plt.xlim(xran)
 plt.ylim(yrane)
-ax.tick_params(labelsize=fs-1)
-ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-ax.set_xticks(xticks)
-plt.gca().xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
-ticker(ax)
-ax = plt.axes([0.135, 0.22, 0.10, 0.26])
+boliler_plate(plt, ax)
+ax = plt.axes([0.133, 0.28, 0.09, 0.2])
 plt.plot(temp2, pressure/pc.bar, c='red', lw=2)
 ax.set_yscale('log')
 ax.set_ylim(np.amax(pressure/pc.bar), np.amin(pressure/pc.bar))
@@ -219,32 +217,18 @@ ax.set_ylabel('Pressure (bar)', fontsize=fs-3)
 ax = plt.subplot(222)
 plt.text(0.02, 0.92, 'CH4, Na, K, H2 Ray, H2-H2 CIA', fontsize=fs,
     transform=ax.transAxes)
-ax.plot(pyrat_wl, gaussf(pyrat_methane, 4.0), c='blue')
+ax.plot(pyrat_wl, gaussf(pyrat_methane, 8.0), c='blue')
 ax.plot(petit_wl, petit_methane, c='orange', alpha=0.75)
-ax.set_xscale('log')
-ax.set_xlabel('Wavelength (microns)', fontsize=fs)
 ax.set_ylabel(r'Transit radius ($\rm R_{Jup}$)', fontsize=fs)
-plt.xlim(xran)
 plt.ylim(yrant)
-ax.tick_params(labelsize=fs-1)
-ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-ax.set_xticks(xticks)
-plt.gca().xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
-ticker(ax)
+boliler_plate(plt, ax)
 ax = plt.subplot(224)
 plt.plot(pyrat_wl, planck_hot, c='0.5')
 plt.plot(pyrat_wl, planck_cold, c='0.5')
-plt.plot(pyrat_wl, gaussf(pyrat_methane_emission, 4.0), c='blue')
+plt.plot(pyrat_wl, gaussf(pyrat_methane_emission, 8.0), c='blue')
 plt.plot(petit_wl, petit_methane_emission, c='orange', alpha=0.75)
-plt.xscale('log')
-plt.xlabel('Wavelength (microns)', fontsize=fs)
 plt.ylabel(r'Planet flux (erg s$^{-1}$ cm$^{-2}$ cm)', fontsize=fs)
-plt.xlim(xran)
 plt.ylim(yrane)
-ax.tick_params(labelsize=fs-1)
-ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-ax.set_xticks(xticks)
-plt.gca().xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
-ticker(ax)
+boliler_plate(plt, ax)
 plt.savefig('../plots/pyratbay-petit_spectrum_comparison.pdf')
 plt.savefig('../plots/pyratbay-petit_spectrum_comparison.png', dpi=300)

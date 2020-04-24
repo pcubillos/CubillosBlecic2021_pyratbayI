@@ -3,16 +3,20 @@ topdir=`pwd`
 
 # Clone (download) the necessary code:
 pip install mc3>=3.0.0
-pip install pyratbay>=0.9.0a3
-#pip install lbl-repack>=1.4.1
+pip install pyratbay>=0.9.0a5
 
 # Install petitRADTRANS:
 # TBD
 
 # Install taurex:
+cd $topdir
 git clone https://github.com/ucl-exoplanets/TauREx3_public.git taurex
 cd taurex
-pythonsetup.py develop
+python setup.py develop
+
+# Install rate:
+cd $topdir
+git clone https://github.com/pcubillos/rate
 
 
 # Generate filter files:
@@ -48,11 +52,11 @@ pbay -pf exomol ../inputs/opacity/12C-1H4__YT10to10.pf
 
 # Make TLI files:
 cd $topdir/run_setup
-pbay -c tli_hitemp_CO.cfg
 pbay -c tli_exomol_H2O.cfg
-pbay -c tli_hitemp_CO2.cfg
 pbay -c tli_exomol_CH4.cfg
 pbay -c tli_exomol_HCN.cfg
+pbay -c tli_hitemp_CO.cfg
+pbay -c tli_hitemp_CO2.cfg
 
 # Make atmospheric files:
 cd $topdir/run_setup
@@ -60,11 +64,11 @@ pbay -c atm_uniform.cfg
 
 # Make opacity files:
 cd $topdir/run_setup
-pbay -c opacity_H2O_1.0-5.5um.cfg
-pbay -c opacity_HCN_1.0-5.5um.cfg
-pbay -c opacity_CH4_1.0-5.5um.cfg
-pbay -c opacity_CO2_1.0-5.5um.cfg
-pbay -c opacity_CO_1.0-5.5um.cfg
+pbay -c opacity_H2O_0.5-10.0um.cfg
+pbay -c opacity_HCN_0.5-10.0um.cfg
+pbay -c opacity_CH4_0.5-10.0um.cfg
+pbay -c opacity_CO2_0.5-10.0um.cfg
+pbay -c opacity_CO_0.5-10.0um.cfg
 
 # Opacity comparison:
 cd $topdir/run_validation_opacities

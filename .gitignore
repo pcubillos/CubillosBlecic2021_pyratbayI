@@ -1,6 +1,7 @@
 # Pyrat Bay inputs
 pyratbay/
-repack/
+rate/
+taurex/
 run01/TEA.cfg
 code/filter_info.txt
 *.trans
