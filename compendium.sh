@@ -25,6 +25,7 @@ python code/make_filters.py
 
 # Download exomol repack data:
 # TBD
+wget -i wget_repack_exomol_H2O-CH4-HCN.txt
 
 # Download HITEMP data:
 cd $topdir/inputs/opacity
