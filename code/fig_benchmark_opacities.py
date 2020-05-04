@@ -33,21 +33,22 @@ press = pa.pressure('1e-4 bar', '1e2 bar', nlayers)
 temp  = np.tile(1000.0, nlayers)
 species    = 'H2    He     H2O   CH4   CO    CO2'.split()
 abundances = [0.86, 0.14, 1e-4, 1e-4, 1e-4, 1e-4]
-atmfile = 'exomol_opacity_validation.atm'
+atmfile = 'exomol_opacity_benchmark.atm'
 
 q_atm = pa.uniform(press, temp, species, abundances, atmfile=atmfile)
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-pyrat = pb.run('H2O_spectrum.cfg')
+pyrat = pb.run('H2O_spectrum.cfg', init=True)
 wl_pyrat = 1.0/(pyrat.spec.wn*pc.um)
+pyrat.run()
 ec_H2O = pyrat.ex.ec
 
-pyrat = pb.run('CO_spectrum.cfg')
+pyrat = pb.run('CO_spectrum.cfg', init=True)
 pyrat.iso.ratio[1:] = 1e-30  # Consider only the first isotope
 pyrat.run()
 ec_CO = pyrat.ex.ec
 
-pyrat = pb.run('CO2_spectrum.cfg')
+pyrat = pb.run('CO2_spectrum.cfg', init=True)
 pyrat.iso.ratio[1:] = 1e-30  # Consider only the first isotope
 pyrat.run()
 ec_CO2 = pyrat.ex.ec

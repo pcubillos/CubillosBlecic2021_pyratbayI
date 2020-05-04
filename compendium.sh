@@ -11,6 +11,8 @@ pip install pyratbay>=0.9.0a5
 # Install taurex:
 cd $topdir
 git clone https://github.com/ucl-exoplanets/TauREx3_public.git taurex
+# Patch constants:
+cp code/taurex_patch/constants.py taurex/taurex/constants.py
 cd taurex
 python setup.py develop
 
@@ -72,12 +74,21 @@ pbay -c opacity_CO2_0.5-10.0um.cfg
 pbay -c opacity_CO_0.5-10.0um.cfg
 
 # Opacity comparison:
-cd $topdir/run_validation_opacities
-python ../code/fig_validation_opacities.py
+cd $topdir/run_benchmark_opacities
+python ../code/fig_benchmark_opacities.py
 
 # Forward-model comparison:
-cd $topdir/run_validation_forward_model
-python ../code/fig_validation_forward_model.py
+cd $topdir/run_benchmark_forward_model
+python ../code/fig_benchmark_forward_model.py
+
+# Retrieval comparison:
+cd $topdir
+python code/setup_taurex_ariel.py
+python code/taurex_ariel_sim.py
+
+cd $topdir/run_benchmark_retrieval
+# TBD: Run retrievals script
+python ../code/fig_benchmark_retrieval.py
 
 
 # Flat-curve fit to the data:
