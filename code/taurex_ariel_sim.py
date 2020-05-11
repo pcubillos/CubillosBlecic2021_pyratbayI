@@ -39,6 +39,12 @@ def simulate_ariel(rplanet, mplanet, tplanet, qplanet, pcloud,
     If kmag is not None, also generate synthetic ARIEL observations.
     There is plenty of hardcoded stuff down here.
     """
+    # Prep up TauREx:
+    inputs_dir = '../inputs/taurex/'
+    OpacityCache().clear_cache()
+    OpacityCache().set_opacity_path(inputs_dir)
+    CIACache().set_cia_path(inputs_dir)
+
     kflux_HD209 = 1780045.0
     kmag_HD209 = 6.31
     # Pressure boundaries (pascal):
@@ -128,12 +134,6 @@ def simulate_ariel(rplanet, mplanet, tplanet, qplanet, pcloud,
 
 
 if __name__ == "__main__":
-    # Prep up TauREx:
-    inputs_dir = '../inputs/taurex/'
-    OpacityCache().clear_cache()
-    OpacityCache().set_opacity_path(inputs_dir)
-    CIACache().set_cia_path(inputs_dir)
-
     # Prep up ARIEL filters:
     filter_dir = '../inputs/filters/'
     filters = [f'{filter_dir}{ffile}' for ffile in os.listdir(filter_dir)

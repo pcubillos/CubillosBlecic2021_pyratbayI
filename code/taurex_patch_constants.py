@@ -1,0 +1,21 @@
+"""Defines constants used in taurex"""
+
+AMU = 1.660538921e-27
+KBOLTZ = 1.380648813e-23
+PI = 3.14159265359
+AU = 1.49597871e+11
+PLANCK = 6.62606957e-34
+SPDLIGT = 299792458
+
+#G = 6.67384e-11
+#RSOL = 6.955e8
+#RJUP = 6.9911e7
+#MSOL = 1.98847542e+30
+#MJUP = 1.898e27
+
+# Same values as Pyrat Bay:
+G = 6.67408e-11
+RSOL = 6.957e08
+RJUP = 7.1492e7
+MSOL = 1.9885e+30
+MJUP = 1.8982e+27

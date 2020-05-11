@@ -12,7 +12,7 @@ pip install pyratbay>=0.9.0a5
 cd $topdir
 git clone https://github.com/ucl-exoplanets/TauREx3_public.git taurex
 # Patch constants:
-cp code/taurex_patch/constants.py taurex/taurex/constants.py
+cp code/taurex_patch_constants.py taurex/taurex/constants.py
 cd taurex
 python setup.py develop
 
