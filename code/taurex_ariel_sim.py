@@ -39,12 +39,6 @@ def simulate_ariel(rplanet, mplanet, tplanet, qplanet, pcloud,
     If kmag is not None, also generate synthetic ARIEL observations.
     There is plenty of hardcoded stuff down here.
     """
-    # Prep up TauREx:
-    inputs_dir = '../inputs/taurex/'
-    OpacityCache().clear_cache()
-    OpacityCache().set_opacity_path(inputs_dir)
-    CIACache().set_cia_path(inputs_dir)
-
     kflux_HD209 = 1780045.0
     kmag_HD209 = 6.31
     # Pressure boundaries (pascal):
@@ -116,7 +110,7 @@ def simulate_ariel(rplanet, mplanet, tplanet, qplanet, pcloud,
     # Poisson noise for transmission spectroscopy:
     if mode == 'transit':
         Fout = sflux
-        Fin  = sflux * (1-bin_depth)
+        Fin  = sflux * (1 - bin_depth)
     elif mode == 'eclipse':
         Fout = sflux * (1 + bin_depth)
         Fin  = sflux
@@ -127,13 +121,19 @@ def simulate_ariel(rplanet, mplanet, tplanet, qplanet, pcloud,
     # Flatten it a bit:
     poisson_noise = 0.2*poisson_noise + 0.8*np.amin(poisson_noise)
     # Add noise floor in quadrature:
-    noise = np.sqrt(poisson_noise**2+noise_floor**2)
+    noise = np.sqrt(poisson_noise**2 + noise_floor**2)
 
-    return tm, wn_tau, depth, bin_depth, bin_wl, noise
+    return tm, wn_tau, depth, bin_depth, noise
 
 
 
 if __name__ == "__main__":
+    # Prep up TauREx:
+    inputs_dir = '../inputs/taurex/'
+    OpacityCache().clear_cache()
+    OpacityCache().set_opacity_path(inputs_dir)
+    CIACache().set_cia_path(inputs_dir)
+
     # Prep up ARIEL filters:
     filter_dir = '../inputs/filters/'
     filters = [f'{filter_dir}{ffile}' for ffile in os.listdir(filter_dir)
@@ -149,7 +149,8 @@ if __name__ == "__main__":
 
 
     # Generate synthetic ARIEL transmission observations with TauREx:
-    planet_data = np.loadtxt('retrieval_validation_transmission.txt', dtype=str)
+    planet_data = np.loadtxt(
+        '../inputs/retrieval_benchmark_transmission.txt', dtype=str)
     planets = planet_data[:,0]
     sys_params = np.array(planet_data[:,1:7], np.double)
     qplanets   = np.array(planet_data[:,7:11], np.double)
@@ -164,7 +165,7 @@ if __name__ == "__main__":
         mplanet *= pc.mearth
         qplanet = qplanets[i]
         pcloud = 10**pclouds[i]
-        tm, wn_tau, depth, bin_depth, bin_wl, uncert = simulate_ariel(
+        tm, wn_tau, depth, bin_depth, uncert = simulate_ariel(
             rplanet, mplanet, tplanet, qplanet, pcloud, rstar, tstar,
             mode='transit', noise_floor=noise_floor[i], kmag=kmag,
             band_trans=band_trans, band_wn=band_wn)
@@ -186,7 +187,8 @@ if __name__ == "__main__":
 
 
     # Generate synthetic ARIEL emission obseravtions with TauREx:
-    planet_data = np.loadtxt('retrieval_validation_emission.txt', dtype=str)
+    planet_data = np.loadtxt(
+        '../inputs/retrieval_benchmark_emission.txt', dtype=str)
     planets = planet_data[:,0]
     sys_params = np.array(planet_data[:,1:7], np.double)
     tpars      = np.array(planet_data[:,7:9], np.double)
@@ -201,7 +203,7 @@ if __name__ == "__main__":
         rplanet *= pc.rearth
         mplanet *= pc.mearth
         qplanet = qplanets[i]
-        tm, wn_tau, depth, bin_depth, bin_wl, uncert = simulate_ariel(
+        tm, wn_tau, depth, bin_depth, uncert = simulate_ariel(
             rplanet, mplanet, tplanet, qplanet, pcloud, rstar, tstar,
             tpars=tpars[i], mode='eclipse', noise_floor=noise_floor,
             kmag=kmag, band_trans=band_trans, band_wn=band_wn)

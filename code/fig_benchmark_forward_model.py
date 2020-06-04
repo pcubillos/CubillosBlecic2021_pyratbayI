@@ -1,5 +1,7 @@
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter1d as gaussf
+import matplotlib
+import matplotlib.pyplot as plt
 
 import pyratbay as pb
 import pyratbay.io as io
@@ -166,14 +168,14 @@ pyrat_methane_emission = np.copy(pyrat.spec.spectrum)
 # Now, plot everything:
 
 # T = 1359, 1723
-planck_hot  = pb.starspec.bbflux(pyrat.spec.wn, np.amax(temp2))
-planck_cold = pb.starspec.bbflux(pyrat.spec.wn, np.amin(temp2))
+planck_hot  = pb.spectrum.bbflux(pyrat.spec.wn, np.amax(temp2))
+planck_cold = pb.spectrum.bbflux(pyrat.spec.wn, np.amin(temp2))
 
 fs = 14
 xticks = [0.3, 0.6, 1, 2, 3, 6, 10]
 xran = 0.5, 10.0
 yrant = 0.983, 1.046
-yrane = -2000, 95000
+yrane = -2000, 96000
 
 def boliler_plate(plt, ax):
     plt.xscale('log')
@@ -186,9 +188,9 @@ def boliler_plate(plt, ax):
     ticker(ax)
 
 
-plt.figure(325, (13,9))
+plt.figure(325, (12.5,8))
 plt.clf()
-plt.subplots_adjust(0.08, 0.07, 0.97, 0.99, hspace=0.18, wspace=0.22)
+plt.subplots_adjust(0.085, 0.07, 0.98, 0.99, hspace=0.18, wspace=0.22)
 ax = plt.subplot(221)
 plt.text(0.02, 0.92, 'H2O, CO, H2 Ray, H2-H2 CIA', fontsize=fs,
     transform=ax.transAxes)
@@ -208,7 +210,7 @@ plt.plot(petit_wl, petit_emission, c='orange', alpha=0.75)
 plt.ylabel(r'Planet flux (erg s$^{-1}$ cm$^{-2}$ cm)', fontsize=fs)
 plt.ylim(yrane)
 boliler_plate(plt, ax)
-ax = plt.axes([0.133, 0.28, 0.09, 0.2])
+ax = plt.axes([0.139, 0.295, 0.08, 0.18])
 plt.plot(temp2, pressure/pc.bar, c='red', lw=2)
 ax.set_yscale('log')
 ax.set_ylim(np.amax(pressure/pc.bar), np.amin(pressure/pc.bar))

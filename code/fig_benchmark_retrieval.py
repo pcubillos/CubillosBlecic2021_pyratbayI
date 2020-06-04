@@ -80,7 +80,8 @@ nplanets = len(transmission)
 tnames = [mc_file.split('_')[-1].split('.')[0]
     for mc_file in transmission]
 
-planet_data = np.loadtxt('retrieval_validation_transmission.txt', dtype=str)
+planet_data = np.loadtxt(
+    '../inputs/retrieval_benchmark_transmission.txt', dtype=str)
 planets = list(planet_data[:,0])
 ifit = [6, 4, 7, 8, 9, 10, 11]
 params = np.array(planet_data[:,ifit], np.double)
@@ -153,7 +154,8 @@ em_best = np.zeros((nplanets, em_npars))
 em_posterior = np.zeros((nplanets, em_npars), object)
 tp_post = np.zeros((nplanets, 5, nlayers))
 tp_best = np.zeros((nplanets, nlayers))
-planet_data = np.loadtxt('retrieval_validation_emission.txt', dtype=str)
+planet_data = np.loadtxt(
+    '../inputs/retrieval_benchmark_emission.txt', dtype=str)
 planets = list(planet_data[:,0])
 ifit = [7, 8, 6, 4, 9, 10, 11, 12]
 params = np.array(planet_data[:,ifit], np.double)
@@ -200,31 +202,31 @@ for i in range(nplanets):
         PDF[i].append(pdf)
         Xpdf[i].append(xpdf)
 
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Plot spectra:
+
 wl = 1.0/(wn*pc.um)
 bandwl = 1.0/(pyrat.obs.bandwn*pc.um)
 
-
-# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-# Plot spectra:
-rect = [0.075, 0.05, 0.985, 0.99]
 margin = 0.05
 sigma = 8.0
 fs = 10
 lw = 1.0
-ms = 1.5
 logxticks = [0.5, 1.0, 2.0, 3.0, 5.0 , 8.0]
+rect1 = [0.075, 0.54, 0.985, 0.99]
+rect2 = [0.075, 0.04, 0.985, 0.49]
 
 fig = plt.figure(8, (8.2, 10))
 plt.clf()
 axes = []
 for i in range(nplanets):
-    ax = mp.subplotter(rect, margin, i+1, nx=3, ny=8, ymargin=0.025)
+    ax = mp.subplotter(rect1, margin, i+1, nx=3, ny=4, ymargin=0.025)
     axes.append(ax)
     if tr_bestfit[i] is not None:
         plt.plot(wl, gaussf(tr_bestfit[i], sigma)/pc.percent, lw=lw, c='orange')
     plt.errorbar(bandwl, tr_data[i]/pc.percent, tr_uncert[i]/pc.percent,
-        fmt='o', alpha=0.8,
-        ms=ms, color='b', ecolor='0.4', elinewidth=lw, capthick=lw, zorder=3)
+        fmt='o', alpha=0.7, ms=1.5, color='b', ecolor='0.3',
+        elinewidth=lw, capthick=lw, zorder=3)
     yran = ax.get_ylim()
     ax.tick_params(labelsize=fs-1, direction='in', which='both')
     ax.set_xscale('log')
@@ -236,13 +238,16 @@ for i in range(nplanets):
         transform=ax.transAxes)
     if i%3 == 0:
         plt.ylabel(r'$(R_{\rm p}/R_{\rm s})^2$  (%)', fontsize=fs)
+    if i >= 9:
+        ax.set_xlabel(r'Wavelength (um)', fontsize=fs)
 for i in range(nplanets):
-    ax = mp.subplotter(rect, margin, i+1+nplanets, nx=3, ny=8, ymargin=0.025)
+    ax = mp.subplotter(rect2, margin, i+1, nx=3, ny=4, ymargin=0.025)
     axes.append(ax)
     if em_bestfit[i] is not None:
         plt.plot(wl, gaussf(em_bestfit[i], sigma)/pc.ppt,lw=lw, c='orange')
-    plt.errorbar(bandwl, em_data[i]/pc.ppt, em_uncert[i]/pc.ppt, fmt='o', alpha=0.7,
-        ms=ms, color='b', ecolor='0.3', elinewidth=lw, capthick=lw, zorder=3)
+    plt.errorbar(bandwl, em_data[i]/pc.ppt, em_uncert[i]/pc.ppt,
+        fmt='o', alpha=0.7, ms=1.5, color='b', ecolor='0.3',
+        elinewidth=lw, capthick=lw, zorder=3)
     yran = ax.get_ylim()
     ax.set_xscale('log')
     plt.gca().xaxis.set_minor_formatter(NullFormatter())
@@ -285,11 +290,11 @@ tmin, tmax = 0.4, 0.6
 width = np.array([
 #   TRA1  G1214  G436  W107  H11   H26  W39  HD1  HD2  K11   55C   W76
     [ 80,  150,  180,  70,   355,  300, 110, 860, 270, 420, 2390, 1000], # T
-    [0.09, 0.12, 0.06, 0.15, 0.18, 0.9, 0.2, 0.3, 0.2, 0.8,  1.0,  0.9], # R
+    [0.09, 0.12, 0.06, 0.18, 0.18, 0.9, 0.2, 0.3, 0.2, 0.8,  1.0,  0.9], # R
     [1.1,  0.6,  0.7,  0.4,  2.0,  0.0, 0.7, 3.2, 0.7, 0.7,  6.0,  1.5], # H2O
     [0.7,  0.5,  0.7,  0.3,  1.7,  1.7, 0.0, 0.0, 0.7, 0.4,  0.0,  0.0], # CH4
     [0.0,  0.0,  0.0,  1.0,  0.0,  6.0, 0.0, 5.0, 2.0, 1.0,  0.0,  4.0], # CO
-    [0.0,  1.7,  5.0,  3.0,  0.0,  0.0, 0.0, 7.0, 1.2, 0.0,  0.0,  0.0], # CO2
+    [0.0,  1.7,  5.0,  2.2,  0.0,  0.0, 0.0, 7.0, 1.2, 0.0,  0.0,  0.0], # CO2
     [3.0,  0.8,  0.0,  1.6,  0.0,  2.5, 0.0, 3.5, 1.7, 0.4,  0.0,  2.5], # cl
     ])
 ranges = np.tile(None, (tr_npars, nplanets, 2))
@@ -315,6 +320,7 @@ ranges[3,width[3]==0] = -12.3, -1.0
 ranges[4,width[4]==0] = -12.3, -1.0
 ranges[5,width[5]==0] = -12.3, -1.0
 ranges[4,3] = -12.3, -1.0
+ranges[5,7] = -12.3, -1.0
 idx = 0, 2, 4, 6, 10
 ranges[6,idx] = 2.1, -3.5
 
@@ -359,6 +365,7 @@ axes[1,3].set_yticks(np.arange(10.25, axes[1,3].get_ylim()[1], 0.04))
 axes[2,0].yaxis.set_major_locator(MultipleLocator(0.3))
 axes[3,5].yaxis.set_major_locator(MultipleLocator(0.4))
 axes[4,3].yaxis.set_major_locator(MultipleLocator(3))
+axes[5,7].yaxis.set_major_locator(MultipleLocator(3))
 plt.savefig('../plots/pyratbay-taurex_ret_transmission_comparision.pdf')
 
 
