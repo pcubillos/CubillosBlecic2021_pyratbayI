@@ -11,9 +11,10 @@ pip install pyratbay>=0.9.0a5
 # Install taurex:
 cd $topdir
 git clone https://github.com/ucl-exoplanets/TauREx3_public.git taurex
-# Patch constants:
-cp code/taurex_patch_constants.py taurex/taurex/constants.py
 cd taurex
+git checkout af223d2
+# Patch constants:
+cp ../code/taurex_patch_constants.py taurex/constants.py
 python setup.py develop
 
 # Install rate:
@@ -46,6 +47,9 @@ wget https://hitran.org/data/CIA/H2-H2_2011.cia
 cd $topdir/run_setup
 pbay -cs hitran ../inputs/opacity/H2-H2_2011.cia 2 10
 
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# SETUP
 # Generate partition-function files:
 cd $topdir/run_setup
 pbay -pf exomol ../inputs/opacity/1H-12C-14N__Harris.pf \
@@ -73,39 +77,48 @@ pbay -c opacity_CH4_0.5-10.0um.cfg
 pbay -c opacity_CO2_0.5-10.0um.cfg
 pbay -c opacity_CO_0.5-10.0um.cfg
 
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# BENCHMARK:
 # Opacity comparison:
 cd $topdir/run_benchmark_opacities
 python ../code/fig_benchmark_opacities.py
+
 
 # Forward-model comparison:
 cd $topdir/run_benchmark_forward_model
 python ../code/fig_benchmark_forward_model.py
 
-# Retrieval comparison:
+
+# Generate Ariel sample for retrieval comparison:
 cd $topdir
 python code/setup_taurex_ariel.py
 python code/taurex_ariel_sim.py
 
+# Retrieve Ariel synthetic sample:
 cd $topdir/run_benchmark_retrieval
-# TBD: Run benchmark retrievals script
+# Note: This will take some time to run, you may want to break it down
+# into many files/separate runs
+sh inputs/launch_benchmark_retrievals.sh
+
+# Retrieval benchmark plots:
+cd $topdir/run_benchmark_retrieval
 python ../code/fig_benchmark_retrieval.py
 
 
-# Flat-curve fit to the data:
-cd $topdir/code/
-python $topdir/code/flat_fit.py > stats/flat_fit.dat
-
-
-# Run MCMC transmission retrievals:
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# WFC3 SAMPLE ANALYSIS:
 cd $topdir
-# TBD: Run WFC3 retrievals script
+# Note: This will take some time to run, you may want to break it down
+# into many files/separate runs
+sh inputs/launch_WFC3_retrievals.sh
 
+# Model-comparison stats:
+cd $topdir
+python code/table_model-comparison_stats.py
 
-# Figure 3:
-cd $topdir/run_setup
-python $topdir/fig3.py
-
-# Figures 4 and 5:
-cd $topdir/run02/
-python $topdir/fig4_5.py
+# WFC3 sample plots:
+python code/make_WFC3_pickles.py
+python code/fig_WFC3_summary.py
+python code/fig_adi.py
 

@@ -1,23 +1,16 @@
-#! /usr/bin/env python
-
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 from matplotlib.ticker import MultipleLocator, NullFormatter, ScalarFormatter
 from scipy.ndimage.filters import gaussian_filter1d as gaussf
-#plt.ioff()
+plt.ioff()
 
-import pyratbay as pb
-import pyratbay.constants  as pc
 import pyratbay.atmosphere as pa
+import pyratbay.constants  as pc
 import pyratbay.io as io
-import pyratbay.tools as pt
-
 import mc3
-import mc3.plots as mp
 
-# Temporary:
 import sys
 sys.path.append('code')
 import mc3_plots as mplots
@@ -69,35 +62,6 @@ cfiles = [
     ]
 ntargets = len(cfiles)
 
-for i in range(ntargets):
-    folder, cfile = os.path.split(cfiles[i])
-    _, planet, dset = folder.split('_')
-    with pt.cd(folder):
-        pyrat = pb.run(cfile, init=True, no_logfile=True)
-        mcmc = np.load(pyrat.ret.mcmcfile)
-        post, zchain, zmask = mc3.utils.burn(mcmc)
-        pyrat.ret.posterior = post
-        # I want to evaluate less than ~1e5 unique samples:
-        nmax = int(1e5 / (6 * 0.01*mcmc['acceptance_rate']))
-        pyrat.percentile_spectrum(nmax)
-        pfile = pyrat.ret.mcmcfile.replace('.npz', '.pickle')
-        io.save_pyrat(pyrat, pfile)
-        mcmc.close()
-
-sigma2 = 25.0
-wl = 1e4/pyrat.spec.wn
-
-fig = plt.figure(21)
-plt.clf()
-ax1 = plt.subplot(111)
-ax1.fill_between(wl, gaussf(pyrat.ret.spec_low2,sigma2)/pc.percent,
-    gaussf(pyrat.ret.spec_high2,sigma2)/pc.percent,
-    facecolor="gold", edgecolor="none", alpha=1.0)
-ax1.fill_between(wl, gaussf(pyrat.ret.spec_low1,sigma2)/pc.percent,
-    gaussf(pyrat.ret.spec_high1,sigma2)/pc.percent,
-    facecolor="orange", edgecolor="none", alpha=1.0)
-
-
 
 data = [None for _ in range(ntargets)]
 uncert = [None for _ in range(ntargets)]
@@ -121,6 +85,7 @@ high2 = [None for _ in range(ntargets)]
 # Z = sum(N_Z*m_z) = mu - X - Y
 Zsun = 0.0134
 Xsun = 0.7381
+
 # Indices for species in atmosphere:
 units, specs, press, temp, q, rad = io.read_atm(
     'run_setup/isothermal_1500K_uniform.atm')
@@ -141,7 +106,7 @@ def MH(params, pyrat):
     Y = pyrat.mol.mass[iHe] * q2[iHe]
     X = pyrat.mol.mass[iH]*(
            2*q2[iH2] + q2[iH] + 2*q2[iH2O] + q2[iHCN] + 4*q2[iCH4])
-    Z = mu - X - Y  # X + Y + Z = mu
+    Z = mu - X - Y
     return np.log10(Z/X / (Zsun/Xsun))
 
 
@@ -200,9 +165,10 @@ themes = {
     '$\\log_{10}(f_{\\rm CH4})$': 'green',
     '$\\log_{10}(f_{\\rm HCN})$': 'orange',
 }
+
 line1 = mlines.Line2D([], [], color='blue', linewidth=2.0,
       label=r'$X_{\rm i} = X_{\rm H2O}$')
-line2 = mlines.Line2D([], [], color='red', linewidth=2.0,
+line2 = mlines.Line2D([], [], color='red',  linewidth=2.0,
       label=r'$X_{\rm i} = X_{\rm CO}$')
 line3 = mlines.Line2D([], [], color='black', linewidth=2.0,
       label=r'$X_{\rm i} = X_{\rm CO2}$')
@@ -236,9 +202,9 @@ for i in range(ntargets):
     if i%nrows == 0:
         fig = plt.figure(10+i//nrows, (8.2, 10))
         plt.clf()
-    # The spectrum:
-    ax1 = mp.subplotter(rect, margin1, 1+3*(i%nrows), nx=3, ny=nrows,
-        ymargin=ymargin)
+    # The spectra:
+    ax1 = mc3.plots.subplotter(
+        rect, margin1, 1+3*(i%nrows), nx=3, ny=nrows, ymargin=ymargin)
     if low2[i] is not None:
         ax1.fill_between(wl[i], gaussf(low2[i],sigma2)/pc.percent,
             gaussf(high2[i],sigma2)/pc.percent,
@@ -268,8 +234,8 @@ for i in range(ntargets):
         ax1.yaxis.set_major_locator(MultipleLocator(sticks[i]))
     plt.ylabel(r'$(R_{\rm p}/R_{\rm s})^2$  (%)', fontsize=fs)
     # The posteriors:
-    axes = [mp.subplotter(rect2, margin2, 1+nhist*(i%nrows)+j, nx=nhist,
-            ny=nrows, ymargin=ymargin) for j in range(nhist)]
+    axes = [mc3.plots.subplotter(rect2, margin2, 1+nhist*(i%nrows)+j,
+            nx=nhist, ny=nrows, ymargin=ymargin) for j in range(nhist)]
     mplots.histogram(posteriors[i][:,:nhist-1],
         pnames=texnames[i], bestp=bestp[i], ranges=ranges, quantile=0.683,
         axes=axes, fs=fs, lw=1.2, yscale=None, theme='blue')

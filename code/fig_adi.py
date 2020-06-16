@@ -1,11 +1,8 @@
-#! /usr/bin/env python
-
-import sys
 import os
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-#plt.ioff()
+plt.ioff()
 
 
 # Taken from stats/sample_stats.tex:
@@ -13,7 +10,7 @@ pyrat = [
     'run_GJ-0436b_tsiaras/MCMC_GJ-0436b_tsiaras_1.0-2.0um_w00000-0c.npz',
     'run_HATP-03b_tsiaras/MCMC_HATP-03b_tsiaras_1.0-2.0um_w00000-0c.npz',
     'run_HATP-17b_tsiaras/MCMC_HATP-17b_tsiaras_1.0-2.0um_w00000-0c.npz',
-    'run_HATP-18b_tsiaras/MCMC_HATP-18b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    'run_HATP-18b_tsiaras/MCMC_HATP-18b_tsiaras_1.0-2.0um_w00000-m0.npz',
     'run_HATP-32b_tsiaras/MCMC_HATP-32b_tsiaras_1.0-2.0um_w00000-0c.npz',
     'run_HATP-38b_tsiaras/MCMC_HATP-38b_tsiaras_1.0-2.0um_w00000-0c.npz',
     'run_HATP-41b_tsiaras/MCMC_HATP-41b_tsiaras_1.0-2.0um_w00000-0c.npz',
@@ -26,7 +23,7 @@ pyrat = [
     'run_WASP-069b_tsiaras/MCMC_WASP-069b_tsiaras_1.0-2.0um_w00000-m0.npz',
     'run_WASP-074b_tsiaras/MCMC_WASP-074b_tsiaras_1.0-2.0um_w00000-m0.npz',
     'run_WASP-080b_tsiaras/MCMC_WASP-080b_tsiaras_1.0-2.0um_w00000-0c.npz',
-    'run_WASP-101b_tsiaras/MCMC_WASP-101b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    'run_WASP-101b_tsiaras/MCMC_WASP-101b_tsiaras_1.0-2.0um_w00000-m0.npz',
     None,
     'run_XO-1b_tsiaras/MCMC_XO-1b_tsiaras_1.0-2.0um_w00000-0c.npz',
     ]
@@ -102,7 +99,7 @@ adi_ts = np.array([
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Plot
 
-fs = 11
+fs = 12
 ms = 6
 dy1 = np.tile(1.04, nplanets)
 dy2 = np.tile(1.04, nplanets)
@@ -130,11 +127,11 @@ plt.gca().xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
 ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
 ax.set_xticks([0, 1, 3, 10, 20])
 ax.set_yticklabels([])
-ax.tick_params(labelsize=fs-1)
+ax.tick_params(labelsize=fs)
 
 ax.legend(handles=tsi+pbi+oi, loc='upper right', fontsize=fs)
-ax.set_xlabel("ADI", fontsize=fs)
-ax.set_ylabel("Planet", fontsize=fs)
+ax.set_xlabel("ADI", fontsize=fs+1)
+ax.set_ylabel("Planet", fontsize=fs+1)
 
 plt.axvline( 0, dashes=(7,2,2,2), lw=1.5, color="0.8", zorder=-10)
 plt.axvline( 3, ls="--", lw=1.5, color="0.8", zorder=-10)
