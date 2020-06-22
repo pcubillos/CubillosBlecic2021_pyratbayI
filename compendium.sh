@@ -22,10 +22,6 @@ cd $topdir
 git clone https://github.com/pcubillos/rate
 
 
-# Generate filter files:
-cd $topdir
-python code/make_filters.py
-
 # Download exomol repack data:
 # TBD
 wget -i wget_repack_exomol_H2O-CH4-HCN.txt
@@ -108,6 +104,11 @@ python ../code/fig_benchmark_retrieval.py
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # WFC3 SAMPLE ANALYSIS:
+
+# Generate filter files:
+cd $topdir
+python code/make_filters.py
+
 cd $topdir
 # Note: This will take some time to run, you may want to break it down
 # into many files/separate runs
