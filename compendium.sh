@@ -2,8 +2,8 @@
 topdir=`pwd`
 
 # Clone (download) the necessary code:
-pip install mc3>=3.0.0
-pip install pyratbay>=0.9.0a5
+pip install mc3>=3.0.2
+pip install pyratbay>=0.9.1
 
 # Install petitRADTRANS:
 # TBD
@@ -24,7 +24,7 @@ git clone https://github.com/pcubillos/rate
 
 # Download exomol repack data:
 # TBD
-wget -i wget_repack_exomol_H2O-CH4-HCN.txt
+wget -i wget_repack_exomol_H2O-CH4-HCN-NH3.txt
 
 # Download HITEMP data:
 cd $topdir/inputs/opacity
@@ -52,6 +52,7 @@ pbay -pf exomol ../inputs/opacity/1H-12C-14N__Harris.pf \
                 ../inputs/opacity/1H-13C-14N__Larner.pf
 pbay -pf exomol ../inputs/opacity/1H2-16O__POKAZATEL.pf
 pbay -pf exomol ../inputs/opacity/12C-1H4__YT10to10.pf
+pbay -pf tips NH3 as_exomol
 
 # Make TLI files:
 cd $topdir/run_setup
@@ -60,6 +61,7 @@ pbay -c tli_exomol_CH4.cfg
 pbay -c tli_exomol_HCN.cfg
 pbay -c tli_hitemp_CO.cfg
 pbay -c tli_hitemp_CO2.cfg
+pbay -c tli_hitemp_NH3.cfg
 
 # Make atmospheric files:
 cd $topdir/run_setup
@@ -72,6 +74,14 @@ pbay -c opacity_HCN_0.5-10.0um.cfg
 pbay -c opacity_CH4_0.5-10.0um.cfg
 pbay -c opacity_CO2_0.5-10.0um.cfg
 pbay -c opacity_CO_0.5-10.0um.cfg
+
+# For HD209458b:
+pbay -c opacity_H2O_0.29-5.5um.cfg
+pbay -c opacity_HCN_0.29-5.5um.cfg
+pbay -c opacity_CH4_0.29-5.5um.cfg
+pbay -c opacity_CO2_0.29-5.5um.cfg
+pbay -c  opacity_CO_0.29-5.5um.cfg
+pbay -c opacity_NH3_0.29-5.5um.cfg
 
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -100,6 +110,11 @@ sh inputs/launch_benchmark_retrievals.sh
 # Retrieval benchmark plots:
 cd $topdir/run_benchmark_retrieval
 python ../code/fig_benchmark_retrieval.py
+
+
+# HD 209458b transmission benchmark:
+cd $topdir/run_benchmark_HD209458b
+python ../code/fig_benchmark_HD209458b.py
 
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
