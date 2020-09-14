@@ -3,6 +3,7 @@
 import os
 import numpy as np
 import pyratbay.tools as pt
+import pyratbay.spectrum as ps
 
 
 def read_obs_file(obs_file, out_path='.', make_filters=True):
@@ -33,8 +34,9 @@ def read_obs_file(obs_file, out_path='.', make_filters=True):
         else:
             ffile = f"{out_path}/{data_set}_{inst}_{wave:5.3f}um.dat"
             if make_filters:
-                dummy = pt.tophat(wave, width, margin=0.1*width,
-                                  dlambda=width/500, ffile=ffile)
+                dummy = ps.tophat(
+                    wave, width, margin=0.1*width, dlambda=width/500,
+                    ffile=ffile)
         wl.append(wave)
         widths.append(width)
         rprs.append(data)
