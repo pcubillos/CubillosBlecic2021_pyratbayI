@@ -15,7 +15,7 @@ from taurex.contributions import CIAContribution, AbsorptionContribution, \
     RayleighContribution, SimpleCloudsContribution
 
 import pyratbay.io as io
-import pyratbay.tools as pt
+import pyratbay.spectrum as ps
 import pyratbay.constants as pc
 
 
@@ -101,11 +101,11 @@ def simulate_ariel(rplanet, mplanet, tplanet, qplanet, pcloud,
     # Sum flux in bands, rather than average:
     sflux = []
     for btrans, bwn in zip(band_trans, band_wn):
-        resampled, wnidx = pt.resample(btrans, bwn, wn_tau)
+        resampled, wnidx = ps.resample(btrans, bwn, wn_tau)
         resampled /= np.amax(resampled)
         sflux.append(np.trapz(starflux[wnidx]*resampled, wn_tau[wnidx]))
     sflux = np.array(sflux)
-    bin_depth = np.array(pt.band_integrate(depth, wn_tau, band_trans, band_wn))
+    bin_depth = np.array(ps.band_integrate(depth, wn_tau, band_trans, band_wn))
 
     # Poisson noise for transmission spectroscopy:
     if mode == 'transit':

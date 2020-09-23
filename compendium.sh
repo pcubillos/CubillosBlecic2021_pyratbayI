@@ -23,16 +23,15 @@ git clone https://github.com/pcubillos/rate
 
 
 # Download exomol repack data:
-# TBD
-wget -i wget_repack_exomol_H2O-CH4-HCN-NH3.txt
+wget -i wget_repack.txt
 
-# Download HITEMP data:
+# Download HITEMP CO2 data:
 cd $topdir/inputs/opacity
 wget -i wget_hitemp_CO2.txt
 unzip '*.zip'
 rm -f *.zip
 
-# Download CO data:
+# Download HITEMP CO data:
 cd $topdir/inputs/opacity
 wget https://hitran.org/hitemp/data/bzip2format/05_HITEMP2019.par.bz2
 bzip2 -d 05_HITEMP2019.par.bz2
@@ -52,6 +51,7 @@ pbay -pf exomol ../inputs/opacity/1H-12C-14N__Harris.pf \
                 ../inputs/opacity/1H-13C-14N__Larner.pf
 pbay -pf exomol ../inputs/opacity/1H2-16O__POKAZATEL.pf
 pbay -pf exomol ../inputs/opacity/12C-1H4__YT10to10.pf
+pbay -pf exomol ../inputs/opacity/12C-16O2__UCL-4000.pf
 pbay -pf tips NH3 as_exomol
 
 # Make TLI files:
@@ -59,13 +59,15 @@ cd $topdir/run_setup
 pbay -c tli_exomol_H2O.cfg
 pbay -c tli_exomol_CH4.cfg
 pbay -c tli_exomol_HCN.cfg
+pbay -c tli_exomol_CO2.cfg
+pbay -c tli_exomol_NH3.cfg
 pbay -c tli_hitemp_CO.cfg
 pbay -c tli_hitemp_CO2.cfg
-pbay -c tli_hitemp_NH3.cfg
 
 # Make atmospheric files:
 cd $topdir/run_setup
 pbay -c atm_uniform.cfg
+pbay -c atm_HD209458b.cfg
 
 # Make opacity files:
 cd $topdir/run_setup
@@ -80,8 +82,12 @@ pbay -c opacity_H2O_0.29-5.5um.cfg
 pbay -c opacity_HCN_0.29-5.5um.cfg
 pbay -c opacity_CH4_0.29-5.5um.cfg
 pbay -c opacity_CO2_0.29-5.5um.cfg
-pbay -c  opacity_CO_0.29-5.5um.cfg
+pbay -c opacity_CO_0.29-5.5um.cfg
 pbay -c opacity_NH3_0.29-5.5um.cfg
+
+# Generate filter files:
+cd $topdir
+python code/make_filters.py
 
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -114,15 +120,14 @@ python ../code/fig_benchmark_retrieval.py
 
 # HD 209458b transmission benchmark:
 cd $topdir/run_benchmark_HD209458b
+pbay -c mcmc_transmission_HD209458b_MM2017.cfg
+pbay -c mcmc_transmission_HD209458b_P2019.cfg
+# HD 209458b benchmark plots:
 python ../code/fig_benchmark_HD209458b.py
 
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # WFC3 SAMPLE ANALYSIS:
-
-# Generate filter files:
-cd $topdir
-python code/make_filters.py
 
 cd $topdir
 # Note: This will take some time to run, you may want to break it down
