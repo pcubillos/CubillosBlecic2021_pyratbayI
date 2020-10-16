@@ -13,7 +13,7 @@ cd $topdir
 git clone https://github.com/ucl-exoplanets/TauREx3_public.git taurex
 cd taurex
 git checkout af223d2
-# Patch constants:
+# Fix constants:
 cp ../code/taurex_patch_constants.py taurex/constants.py
 python setup.py develop
 
@@ -23,6 +23,7 @@ git clone https://github.com/pcubillos/rate
 
 
 # Download exomol repack data:
+cd $topdir/inputs/opacity
 wget -i wget_repack.txt
 
 # Download HITEMP CO2 data:
@@ -42,6 +43,9 @@ wget https://hitran.org/data/CIA/H2-H2_2011.cia
 cd $topdir/run_setup
 pbay -cs hitran ../inputs/opacity/H2-H2_2011.cia 2 10
 
+# Download external xsec data:
+cd $topdir/inputs/taurex
+wget -i wget_xsecs.txt
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # SETUP

@@ -1,0 +1,8 @@
+http://www.exomol.com/db/CO/12C-16O/Li2015/C-O-NatAbund__Li2015.R15000_0.3-50mu.xsec.TauREx.h5
+http://www.exomol.com/db/CO2/12C-16O2/UCL-4000/12C-16O2__UCL-4000.R15000_0.3-50mu.xsec.TauREx.h5
+http://www.exomol.com/db/H2O/1H2-16O/POKAZATEL/1H2-16O__POKAZATEL__R15000_0.3-50mu.xsec.TauREx.h5
+
+https://www.dropbox.com/sh/13y33d02vh56jh2/AABKda8SZTNjLmOeHIqjMAbMa/xsec/xsec_sampled_R15000_0.3-15/CO.R15000.TauREx.pickle
+https://www.dropbox.com/sh/13y33d02vh56jh2/AAAWeLj1Rt5O-aQ5HBh1NvHya/xsec/xsec_sampled_R15000_0.3-15/CH4.R15000.TauREx.pickle
+https://www.dropbox.com/sh/13y33d02vh56jh2/AAAMeRdOH554phUQI7i9gWRua/xsec/xsec_sampled_R15000_0.3-15/CO2.R15000.TauREx.pickle
+https://www.dropbox.com/sh/13y33d02vh56jh2/AAD11XEMcuOsj1zOI3BRlJNxa/xsec/xsec_sampled_R15000_0.3-15/H2O.R15000.TauREx.pickle

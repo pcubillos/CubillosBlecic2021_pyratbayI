@@ -13,12 +13,15 @@ import pyratbay.atmosphere as pa
 HOME = os.path.abspath('..')
 
 # Read ExoMol cross-section opacity data:
-xs_H2O, press_exomol, temp_exomol, wn_exomol, _ = io.import_exomol_xs(
-    f'{HOME}/inputs/taurex/H2O_pokazatel.R10000.TauREx.pickle')
-xs_CO2 = io.import_exomol_xs(
-    f'{HOME}/inputs/taurex/CO2.R10000.TauREx.pickle', read_all=False)
-xs_CO  = io.import_exomol_xs(
-    f'{HOME}/inputs/taurex/CO_Li2015.R10000.TauREx.pickle', read_all=False)
+xs_H2O, press_exomol, temp_exomol, wn_exomol, _ = io.import_xs(
+    f'{HOME}/inputs/taurex/1H2-16O__POKAZATEL__R15000_0.3-50mu.xsec.TauREx.h5',
+    source='exomol')
+xs_CO2 = io.import_xs(
+    f'{HOME}/inputs/taurex/12C-16O2__UCL-4000.R15000_0.3-50mu.xsec.TauREx.h5',
+    source='exomol', read_all=False)
+xs_CO = io.import_xs(
+    f'{HOME}/inputs/taurex/C-O-NatAbund__Li2015.R15000_0.3-50mu.xsec.TauREx.h5',
+    source='exomol', read_all=False)
 
 wl_exomol = 1.0/(wn_exomol*pc.um)
 xs_H2O = xs_H2O[3::3]
@@ -37,55 +40,55 @@ atmfile = 'exomol_opacity_benchmark.atm'
 q_atm = pa.uniform(press, temp, species, abundances, atmfile=atmfile)
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ipress = 3
+itemp = 9
+
 pyrat = pb.run('H2O_spectrum.cfg', init=True)
 wl_pyrat = 1.0/(pyrat.spec.wn*pc.um)
-pyrat.run()
-ec_H2O = pyrat.ex.ec
+ec_H2O = pyrat.get_ec(ipress)[0][0]
 
 pyrat = pb.run('CO_spectrum.cfg', init=True)
-pyrat.iso.ratio[1:] = 1e-30  # Consider only the first isotope
-pyrat.run()
-ec_CO = pyrat.ex.ec
+ec_CO = pyrat.get_ec(ipress)[0][0]
 
 pyrat = pb.run('CO2_spectrum.cfg', init=True)
 pyrat.iso.ratio[1:] = 1e-30  # Consider only the first isotope
-pyrat.run()
-ec_CO2 = pyrat.ex.ec
+ec_CO2 = pyrat.get_ec(ipress)[0][0]
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-ipress = 3
-itemp = 9
 
 iH2O = species.index('H2O')
 iCO  = species.index('CO')
 iCO2 = species.index('CO2')
-ec = [ec_H2O[ipress]/pyrat.atm.d[ipress,iH2O],
-      ec_CO [ipress]/pyrat.atm.d[ipress,iCO],
-      ec_CO2[ipress]/pyrat.atm.d[ipress,iCO2]]
+ec = [ec_H2O/pyrat.atm.d[ipress,iH2O],
+      ec_CO /pyrat.atm.d[ipress,iCO],
+      ec_CO2/pyrat.atm.d[ipress,iCO2]]
 xs = xs_H2O[ipress,itemp], xs_CO[ipress,itemp], xs_CO2[ipress,itemp]
 
 fs = 10
+lw = 1.25
 xlim = 1.0, 10.0
 xticks = [1, 2, 3, 4, 6, 10]
 xran = [(1.4, 1.432), (1.177, 1.232), (2.6, 2.73)]
+xran = [(1.409, 1.432), (1.177, 1.232), (2.62, 2.685)]
 yran1 = [(3e-27, 5e-14), (1e-48, 1e-15), (1e-33, 1e-15)]
 yran2 = [(1e-25, 1e-18), (8e-34, 3e-24), (1e-25, 1e-18)]
-labels = ['H2O/ExoMol-POKAZATEL', 'CO/HITEMP-Li', 'CO2/HITEMP-2010']
+labels = ['H2O/ExoMol-POKAZATEL', 'CO/HITEMP-Li', 'CO2/Exomol-UCL4000']
 
-plt.figure(50, (8, 7))
+plt.figure(150, (8, 7))
 plt.clf()
 ax = plt.subplot(111)
 plt.subplots_adjust(0.1, 0.08, 0.99, 0.99, wspace=0.2, hspace=0.15)
 for i in range(len(xs)):
     for j in [0,1]:
         ax = plt.subplot(3, 2, 2*i+1+j)
-        plt.plot(wl_pyrat, ec[i], c='b', label='pyratbay')
-        plt.plot(wl_exomol, xs[i], c='orange', label='exomol', alpha=0.7)
+        plt.plot(wl_pyrat, ec[i], c='b', lw=lw, label='pyratbay')
+        plt.plot(wl_exomol, xs[i], c='orange', lw=lw, label='exomol', alpha=0.7)
         plt.yscale('log')
         if i == 0 and j == 0:
             plt.legend(loc='upper right', fontsize=fs)
         if i == 1 and j == 0:
-            plt.ylabel(r'Opacity (cm$^{2}$ molec$^{-1}$)', fontsize=fs+1)
+            plt.ylabel(
+                r'Opacity cross section (cm$^{2}$ molec$^{-1}$)', fontsize=fs+1)
         if i == 0 and  j == 0:
             plt.text(0.03, 0.8, f'$T$ = {temp_exomol[itemp]:.0f} K',
                      fontsize=fs, transform=ax.transAxes)

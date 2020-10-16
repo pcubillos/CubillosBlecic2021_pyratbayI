@@ -6,7 +6,7 @@ ihttps://zenodo.org/record/3768504/files/pcubillos/NH3_exomol_coyute-byte_0.5-50
 
 
 http://www.exomol.com/db/H2O/1H2-16O/POKAZATEL/1H2-16O__POKAZATEL.pf
-http://exomol.com/db/CH4/12C-1H4/YT10to10/12C-1H4__YT10to10.pf
+http://www.exomol.com/db/CH4/12C-1H4/YT10to10/12C-1H4__YT10to10.pf
 http://www.exomol.com/db/HCN/1H-12C-14N/Harris/1H-12C-14N__Harris.pf
 http://www.exomol.com/db/HCN/1H-13C-14N/Larner/1H-13C-14N__Larner.pf
 http://www.exomol.com/db/CO2/12C-16O2/UCL-4000/12C-16O2__UCL-4000.pf
