@@ -111,8 +111,9 @@ def main():
         ci1[:,i] = -np.amin(xpdf[pdf>HPDmin]), np.amax(xpdf[pdf>HPDmin])
         pdf, xpdf, HPDmin = mc3.stats.cred_region(
             pdf=pdf, xpdf=xpdf, quantile=0.9545)
-        ci2[:,i] = -np.amin(xpdf[pdf>HPDmin]), np.amax(xpdf[pdf>HPDmin])
 
+    # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    # Temperatures:
     lw = 2.0
     fs = 14
     y = np.zeros(ntargets)

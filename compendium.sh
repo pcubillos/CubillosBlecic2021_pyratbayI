@@ -81,7 +81,8 @@ pbay -c opacity_CH4_0.5-10.0um.cfg
 pbay -c opacity_CO2_0.5-10.0um.cfg
 pbay -c opacity_CO_0.5-10.0um.cfg
 
-# For HD209458b:
+# Make opacity files for HD209458b benchmark:
+cd $topdir/run_setup
 pbay -c opacity_H2O_0.29-5.5um.cfg
 pbay -c opacity_HCN_0.29-5.5um.cfg
 pbay -c opacity_CH4_0.29-5.5um.cfg
@@ -144,6 +145,8 @@ python code/table_model-comparison_stats.py
 
 # WFC3 sample plots:
 python code/make_WFC3_pickles.py
-python code/fig_WFC3_summary.py
 python code/fig_adi.py
+python code/fig_WFC3_summary.py
+python code/fig_WFC3_correlation_example.py
+python code/fig_WFC3_detections.py
 
