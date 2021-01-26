@@ -14,7 +14,8 @@ taurex_xs_files = [
 for tr_file in taurex_xs_files:
     mol = os.path.basename(tr_file).split('.')[0]
     pb_file = f'run_setup/taurex_{mol}_opacity_R15000.npz'
-    xs, press, temp, wn, specs = io.import_exomol_xs(tr_file, ofile=pb_file)
+    xs, press, temp, wn, specs = io.import_xs(
+        tr_file, source='taurex', ofile=pb_file)
 
 # Generate an atmospheric profile at TauREx pressure levels:
 T0 = 1480.0
@@ -24,7 +25,7 @@ species = 'H2     He      H2O      CH4      CO       CO2'.split()
 abund   = [0.853, 0.1467, 1.0e-04, 1.0e-04, 1.0e-04, 1.0e-07]
 q = pa.uniform(press, temperature, species, abund)
 io.write_atm(
-    'run_validation_retrieval/taurex.atm',
+    'run_benchmark_retrieval/taurex.atm',
     press, temperature, species, q,
     header='# TauREx profile\n', punits='bar')
 

@@ -36,6 +36,7 @@ best_spec_mm2017, _ = pyrat.eval(bestp)
 
 # TBD: Spectra 1-2sigma widths
 
+# Temperature posteriors:
 mm2017_posterior, _, _ = mc3.utils.burn(mcmc_mm2017)
 ifree = mm2017.ret.pstep[mm2017.ret.itemp] > 0
 mm2017_tpost = pa.temperature_posterior(
@@ -132,7 +133,7 @@ mm2017_hi = [1.68, 2.05, 0.97, 0.21, 0.28, 149,
 wl = 1.0/(pyrat.spec.wn*pc.um)
 bandwl = 1.0/(pyrat.obs.bandwn*pc.um)
 
-sigma = 10.0
+sigma = 12.0
 fs = 9.75
 lw = 1.0
 nlevels = 20
@@ -141,34 +142,36 @@ nb = 14
 
 nhist = npars1 + npars2
 margin2 = 0.01
-ymargin = 0.04
+ymargin = 0.03
 nx = 7
 ny = 3
 
-rect1 = [0.08, 0.8, 0.59, 0.19]
-rect2 = [0.75, 0.8, 0.24, 0.19]
-rect3 = [0.67, 0.5, 1.02, 0.75]
-rect4 = [0.11, 0.325, 0.835, 0.825]
-rect5 = [0.02, 0.04, 0.99, 0.28]
+rect1 = [0.073, 0.8, 0.615, 0.19]
+rect2 = [0.76, 0.8, 0.23, 0.19]
+rect3 = [0.67, 0.51, 1.02, 0.76]
+rect4 = [0.12, 0.325, 0.835, 0.825]
+rect5 = [0.02, 0.03, 0.99, 0.28]
 
 palette = copy.copy(plt.cm.viridis_r)
 palette.set_under(color='w')
 palette.set_bad(color='w')
+p2019_col = pb.plots.alphatize('r', 0.6, 'darkred')
 
 
 fig = plt.figure(18, (8.5, 11.0))
 plt.clf()
 ax = plt.axes(rect1)
 ax.plot(wl, gaussf(best_spec_mm2017, sigma)/pc.percent, lw=lw,
-    c='cornflowerblue', label='pyratbay fit to MM2017')
+    c='royalblue', label='pyratbay fit to MM2017')
 ax.plot(wl, gaussf(best_spec_p2019, sigma)/pc.percent, lw=lw,
     c='orange', label='pyratbay fit to P2019')
 ax.errorbar(
     bandwl, pyrat.obs.data/pc.percent, pyrat.obs.uncert/pc.percent,
-    fmt='o', alpha=0.7, ms=2.5, color='b', ecolor='navy',
+    fmt='o', alpha=0.7, ms=2.5, color=p2019_col,
     elinewidth=lw, capthick=lw, zorder=3, label='data')
 
 ax.tick_params(labelsize=fs-1, direction='in', which='both')
+ax.tick_params(length=0, which='minor')
 ax.set_xscale('log')
 plt.gca().xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
 ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
@@ -181,12 +184,15 @@ ax.legend(loc='upper right', fontsize=fs-1)
 ax2 = plt.axes(rect2)
 pb.plots.temperature(
     mm2017.atm.press, profiles=mm2017_tpost[0:1], labels=['MM2017'],
-    bounds=mm2017_tpost[1:], ax=ax2, theme='blue', fs=fs)
+    bounds=mm2017_tpost[1:3], ax=ax2, theme='blue', fs=fs,
+    colors=['mediumblue'])
 pb.plots.temperature(
     pyrat.atm.press, profiles=p2019_tpost[0:1], labels=['P2019'],
-    bounds=p2019_tpost[1:], ax=ax2, theme='orange', fs=fs,
+    bounds=p2019_tpost[1:3], ax=ax2, theme='orange', fs=fs,
     colors=['darkorange'], alpha=[0.45, 0.25])
-
+ax2.tick_params(labelsize=fs-1, direction='in', which='both')
+ax2.tick_params(length=0, which='minor')
+ax2.set_xlim(800, 1900)
 
 axes = np.tile(None, (npars2, npars2))
 k = 0 # Histogram index
@@ -270,10 +276,12 @@ axes[8].set_xticks([-8, -6, -4])
 
 for ax, med, lo, hi in zip(axes, mm2017_median, mm2017_lo, mm2017_hi):
     y = 0.2*ax.get_ylim()[1]
-    ax.errorbar([med], [y], xerr=[[lo],[hi]], color='navy', marker='D', ms=3.0)
+    ax.errorbar([med], [y], xerr=[[lo],[hi]], color='navy', marker='D', ms=3)
 for ax, med, lo, hi in zip(axes, p2019_median, p2019_lo, p2019_hi):
+    ax.tick_params(length=0, axis='y')
+    plt.setp(ax.xaxis.get_majorticklabels(), rotation=0)
     y = 0.1*ax.get_ylim()[1]
-    ax.errorbar([med], [y], xerr=[[lo],[hi]], color='r', marker='D', ms=3.0)
+    ax.errorbar([med], [y], xerr=[[lo],[hi]], color=p2019_col, marker='D', ms=3)
 axes[0].legend(
     ['pyratbay fit to MM2017', 'pyratbay fit to P2019', None, None,
      'MacDonald & Madhusudhan (2017)', 'Pinhas et al. (2019)'],
@@ -284,7 +292,7 @@ axes[0].legend([(handles[0],handles[2]),
         (handles[1],handles[3]), handles[4],handles[5]],
     ['pyratbay fit to MM2017', 'pyratbay fit to P2019',
      'MacDonald & Madhusudhan (2017)', 'Pinhas et al. (2019)'], 
-    loc=(5.4, -3.7), fontsize=fs-2)
+    loc=(5.4, -2.95), fontsize=fs-2)
 
 plt.savefig('../plots/pyratbay-madhu_HD209458b_comparison.pdf')
 plt.savefig('../plots/pyratbay-madhu_HD209458b_comparison.png', dpi=300)

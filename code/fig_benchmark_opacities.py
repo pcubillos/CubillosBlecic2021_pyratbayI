@@ -72,7 +72,7 @@ xran = [(1.4, 1.432), (1.177, 1.232), (2.6, 2.73)]
 xran = [(1.409, 1.432), (1.177, 1.232), (2.62, 2.685)]
 yran1 = [(3e-27, 5e-14), (1e-48, 1e-15), (1e-33, 1e-15)]
 yran2 = [(1e-25, 1e-18), (8e-34, 3e-24), (1e-25, 1e-18)]
-labels = ['H2O/ExoMol-POKAZATEL', 'CO/HITEMP-Li', 'CO2/Exomol-UCL4000']
+labels = ['H2O/ExoMol-POKAZATEL', 'CO/HITEMP-Li', 'CO2/ExoMol-UCL4000']
 
 plt.figure(150, (8, 7))
 plt.clf()

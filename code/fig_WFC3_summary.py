@@ -1,4 +1,5 @@
 import os
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
@@ -10,10 +11,6 @@ import pyratbay.atmosphere as pa
 import pyratbay.constants  as pc
 import pyratbay.io as io
 import mc3
-
-import sys
-sys.path.append('code')
-import mc3_plots as mplots
 
 
 def roll(array, indices):
@@ -78,8 +75,8 @@ low2 = [None for _ in range(ntargets)]
 high1 = [None for _ in range(ntargets)]
 high2 = [None for _ in range(ntargets)]
 
-# Metallicity (by mass):
-# X + Y + Z = 1.0
+# Mass fractions (Asplund et al. 2009):
+# X + Y + Z = mu, with:
 # X = N_H  * m_H
 # Y = N_He * m_He
 # Z = sum(N_Z*m_z) = mu - X - Y
@@ -96,7 +93,7 @@ iH2O = np.where(specs == 'H2O')[0][0]
 iCH4 = np.where(specs == 'CH4')[0][0]
 iHCN = np.where(specs == 'HCN')[0][0]
 
-def MH(params, pyrat):
+def ZX(params, pyrat):
     q2 = pa.qscale(
         pyrat.atm.qbase, pyrat.mol.name, pyrat.atm.molmodel,
         pyrat.atm.molfree, params[pyrat.ret.imol],
@@ -140,17 +137,17 @@ for i in range(ntargets):
         posteriors[i][:,0], return_index=True, return_inverse=True)
     nunique = np.size(u)
     # Get mean molecular mass:
-    MH_ratio = np.zeros(nunique, np.double)
+    ZX_ratio = np.zeros(nunique, np.double)
     params = pyrat.ret.params
     imol = np.in1d(mcmc['ifree'], pyrat.ret.imol)
     for k in range(nunique):
         params[imol] = posteriors[i][uind[k],imol]
-        MH_ratio[k] = MH(params, pyrat)
+        ZX_ratio[k] = ZX(params, pyrat)
     iN2 = pyrat.ret.pnames.index('log(N2)')
-    # Metallicity by mass with respect to solar values, i.e., [M/H]:
-    posteriors[i][:,iN2] = MH_ratio[uinv]
-    bestp[i][iN2] = MH(bestp[i], pyrat)
-    texnames[i][iN2] = r"$[\rm M/\rm H]$"
+    # Metal mass fraction relative to solar values, i.e., [Z/X]:
+    posteriors[i][:,iN2] = ZX_ratio[uinv]
+    bestp[i][iN2] = ZX(bestp[i], pyrat)
+    texnames[i][iN2] = r"$[\rm Z/\rm X]$"
 
     posteriors[i] = roll(posteriors[i], indices=pyrat.ret.imol[:-1])
     bestp[i] = roll(bestp[i], indices=pyrat.ret.imol[:-1])
@@ -191,7 +188,7 @@ ms = 4.0
 nhist = 5
 nrows = 7
 logxticks = [1.0, 1.4, 2.0, 3.0, 5.0]
-ranges = [(200, 3000), None, (-6,3), (-6,2), (-12,0)]
+ranges = [(100, 3000), None, (-6,3), (-6,2), (-12,0)]
 
 sticks = [None] * ntargets
 sticks[ 3] = 0.03
@@ -236,11 +233,11 @@ for i in range(ntargets):
     # The posteriors:
     axes = [mc3.plots.subplotter(rect2, margin2, 1+nhist*(i%nrows)+j,
             nx=nhist, ny=nrows, ymargin=ymargin) for j in range(nhist)]
-    mplots.histogram(posteriors[i][:,:nhist-1],
+    mc3.plots.histogram(posteriors[i][:,:nhist-1],
         pnames=texnames[i], bestp=bestp[i], ranges=ranges, quantile=0.683,
         axes=axes, fs=fs, lw=1.2, yscale=None, theme='blue')
     for j in range(nhist-1, len(bestp[i])):
-        mplots.histogram(posteriors[i][:,j],
+        mc3.plots.histogram(posteriors[i][:,j],
             pnames=['$\\log_{10}(X_{\\rm i})$'], bestp=bestp[i][j:j+1],
             ranges=[ranges[-1]], quantile=0.683, fs=fs, lw=1.2,
             axes=[axes[-1]], yscale=None, theme=themes[texnames[i][j]])
@@ -260,3 +257,4 @@ for i in range(ntargets):
     else:
         for ax in axes:
             ax.set_xlabel('')
+
