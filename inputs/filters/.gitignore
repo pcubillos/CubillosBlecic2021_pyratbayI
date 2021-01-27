@@ -1,5 +1,5 @@
-gnore everything in this directory
+# Ignore everything in this directory
 *
 # Except these files
 !.gitignore
-
+!ARIEL*
