@@ -1,3 +1,6 @@
+import os
+import sys
+
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter1d as gaussf
 import matplotlib
@@ -8,6 +11,10 @@ import pyratbay.io as io
 import pyratbay.atmosphere as pa
 import pyratbay.constants as pc
 
+if '__file__' not in locals():
+    __file__ = os.getcwd() + '/'
+sys.path.append(
+    os.path.realpath(os.path.dirname(__file__) + '/../petitRADTRANS'))
 from petitRADTRANS import Radtrans
 from petitRADTRANS import nat_cst as nc
 

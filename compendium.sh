@@ -7,6 +7,19 @@ pip install pyratbay>=0.9.1
 
 # Install petitRADTRANS:
 # TBD
+cd $topdir
+git clone https://gitlab.com/mauricemolli/petitRADTRANS
+cd petitRADTRANS
+#git checkout 1441755e
+cp ../code/petit_patch_fort_spec.f90 petitRADTRANS/fort_spec.f90
+cp ../code/petit_patch_radtrans.py petitRADTRANS/radtrans.py
+cd $topdir/petitRADTRANS/petitRADTRANS
+chmod +x make.sh
+./make.sh
+# Download petitRADTRANS opacity data:
+#     https://keeper.mpdl.mpg.de/f/48d25319b7a34569b647/?dl=1
+# unzip input_data.zip and move the folder to
+# $topdir/petitRADTRANS/petitRADTRANS/input_data/
 
 # Install taurex:
 cd $topdir
@@ -108,15 +121,15 @@ python ../code/fig_benchmark_forward_model.py
 
 
 # Generate Ariel sample for retrieval comparison:
-cd $topdir
-python code/setup_taurex_ariel.py
-python code/taurex_ariel_sim.py
+cd $topdir/run_benchmark_retrieval
+python ../code/setup_taurex_ariel.py
+python ../code/taurex_ariel_sim.py
 
 # Retrieve Ariel synthetic sample:
-cd $topdir/run_benchmark_retrieval
 # Note: This will take some time to run, you may want to break it down
 # into many files/separate runs
-sh inputs/launch_benchmark_retrievals.sh
+cd $topdir/run_benchmark_retrieval
+sh ../inputs/launch_benchmark_retrievals.sh
 
 # Retrieval benchmark plots:
 cd $topdir/run_benchmark_retrieval
