@@ -126,18 +126,24 @@ def simulate_ariel(rplanet, mplanet, tplanet, qplanet, pcloud,
     return tm, wn_tau, depth, bin_depth, noise
 
 
-
-if __name__ == "__main__":
-    # Prep up TauREx:
+def setup_cache():
     inputs_dir = '../inputs/taurex/'
     OpacityCache().clear_cache()
     OpacityCache().set_opacity_path(inputs_dir)
     CIACache().set_cia_path(inputs_dir)
 
+
+if __name__ == "__main__":
+    # Prep up TauREx:
+    setup_cache()
+
     # Prep up ARIEL filters:
     filter_dir = '../inputs/filters/'
-    filters = [f'{filter_dir}{ffile}' for ffile in os.listdir(filter_dir)
-               if ffile.startswith('ARIEL')]
+    filters = [
+        f'{filter_dir}{ffile}'
+        for ffile in os.listdir(filter_dir)
+        if ffile.startswith('ARIEL')
+    ]
     bin_wl = [ffile.split('_')[-1].split('um')[0] for ffile in filters]
     wn_sort = np.argsort(np.array(bin_wl, float))
     filters = [filters[idx] for idx in wn_sort]

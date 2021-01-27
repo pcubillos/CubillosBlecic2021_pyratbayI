@@ -6,3 +6,5 @@ https://www.dropbox.com/sh/13y33d02vh56jh2/AABKda8SZTNjLmOeHIqjMAbMa/xsec/xsec_s
 https://www.dropbox.com/sh/13y33d02vh56jh2/AAAWeLj1Rt5O-aQ5HBh1NvHya/xsec/xsec_sampled_R15000_0.3-15/CH4.R15000.TauREx.pickle
 https://www.dropbox.com/sh/13y33d02vh56jh2/AAAMeRdOH554phUQI7i9gWRua/xsec/xsec_sampled_R15000_0.3-15/CO2.R15000.TauREx.pickle
 https://www.dropbox.com/sh/13y33d02vh56jh2/AAD11XEMcuOsj1zOI3BRlJNxa/xsec/xsec_sampled_R15000_0.3-15/H2O.R15000.TauREx.pickle
+https://www.dropbox.com/sh/13y33d02vh56jh2/AADsAOGj0YaMuzqdgUXn8vxEa/cia/HITRAN/H2-H2.db
+https://www.dropbox.com/sh/13y33d02vh56jh2/AADQGaYX7AVzgQq5yVOwaODda/cia/HITRAN/H2-HE.db
