@@ -2,31 +2,30 @@
 topdir=`pwd`
 
 # Clone (download) the necessary code:
-pip install mc3>=3.0.2
-pip install pyratbay>=0.9.1
+pip install 'mc3>=3.0.2'
+pip install 'pyratbay>=0.9.1'
 
 # Install petitRADTRANS:
-# TBD
 cd $topdir
 git clone https://gitlab.com/mauricemolli/petitRADTRANS
 cd petitRADTRANS
-#git checkout 1441755e
+git checkout 1441755e
 cp ../code/petit_patch_fort_spec.f90 petitRADTRANS/fort_spec.f90
 cp ../code/petit_patch_radtrans.py petitRADTRANS/radtrans.py
 cd $topdir/petitRADTRANS/petitRADTRANS
 chmod +x make.sh
 ./make.sh
 # Download petitRADTRANS opacity data:
-#     https://keeper.mpdl.mpg.de/f/48d25319b7a34569b647/?dl=1
-# unzip input_data.zip and move the folder to
-# $topdir/petitRADTRANS/petitRADTRANS/input_data/
+cd $topdir/petitRADTRANS/petitRADTRANS
+wget -O input_data.zip "https://keeper.mpdl.mpg.de/f/48d25319b7a34569b647/?dl=1"
+unzip input_data.zip
+rm input_data.zip
 
 # Install taurex:
 cd $topdir
 git clone https://github.com/ucl-exoplanets/TauREx3_public.git taurex
 cd taurex
 git checkout af223d2
-# Fix constants:
 cp ../code/taurex_patch_constants.py taurex/constants.py
 python setup.py develop
 
@@ -35,7 +34,7 @@ cd $topdir
 git clone https://github.com/pcubillos/rate
 
 
-# Download exomol repack data:
+# Download exomol repack data:  (TBD: upload files)
 cd $topdir/inputs/opacity
 wget -i wget_repack.txt
 
@@ -157,9 +156,8 @@ cd $topdir
 python code/table_model-comparison_stats.py
 
 # WFC3 sample plots:
-python code/make_WFC3_pickles.py
-python code/fig_adi.py
-python code/fig_WFC3_summary.py
 python code/fig_WFC3_correlation_example.py
+python code/fig_WFC3_adi.py
 python code/fig_WFC3_detections.py
-
+python code/make_WFC3_pickles.py
+python code/fig_WFC3_summary.py

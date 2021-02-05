@@ -4,8 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 plt.ioff()
 
+import pyratbay as pb
 import pyratbay.atmosphere as pa
 import pyratbay.io as io
+import pyratbay.tools as pt
 import mc3
 
 
@@ -34,10 +36,6 @@ iHCN = np.where(specs == 'HCN')[0][0]
 
 def ZX(params, pyrat):
     # Mass fractions (Asplund et al. 2009):
-    # X + Y + Z = mu, with:
-    # X = N_H  * m_H
-    # Y = N_He * m_He
-    # Z = sum(N_Z*m_z) = mu - X - Y
     Zsun = 0.0134
     Xsun = 0.7381
 
@@ -58,22 +56,22 @@ def main():
     cfile = 'run_HATP-41b_tsiaras/mcmc_HATP-41b_tsiaras_w00000-mc.cfg'
     folder, cfile = os.path.split(cfile)
     _, planet, dset = folder.split('_')
-    pickle_file = [f for f in os.listdir(folder) if f.endswith('pickle')][0]
-    pyrat = io.load_pyrat(f'{folder}/{pickle_file}')
-    mcmc = np.load(pyrat.ret.mcmcfile)
+    with pt.cd(folder):
+        pyrat = pb.run(cfile, init=True, no_logfile=True)
 
-    post, zchain, zmask = mc3.utils.burn(mcmc)
+    with np.load(pyrat.ret.mcmcfile) as mcmc:
+        post, zchain, zmask = mc3.utils.burn(mcmc)
+        texnames = mcmc['texnames']
+        bestp = mcmc['bestp']
+        imol = np.in1d(mcmc['ifree'], pyrat.ret.imol)
+
     posteriors = pyrat.ret.posterior = post
-    texnames = mcmc['texnames']
-    bestp = mcmc['bestp']
-
     u, uind, uinv = np.unique(
         posteriors[:,0], return_index=True, return_inverse=True)
     nunique = np.size(u)
     # Get mean molecular mass:
     ZX_ratio = np.zeros(nunique, np.double)
     params = pyrat.ret.params
-    imol = np.in1d(mcmc['ifree'], pyrat.ret.imol)
     for k in range(nunique):
         params[imol] = posteriors[uind[k],imol]
         ZX_ratio[k] = ZX(params, pyrat)
@@ -86,7 +84,6 @@ def main():
     posteriors = roll(posteriors, indices=pyrat.ret.imol[:-1])
     bestp = roll(bestp, indices=pyrat.ret.imol[:-1])
     texnames = roll(texnames, indices=pyrat.ret.imol[:-1])
-    mcmc.close()
 
     texnames[4] = texnames[4].replace('f', 'X')
     rect = [0.105, 0.11, 0.99, 0.99]

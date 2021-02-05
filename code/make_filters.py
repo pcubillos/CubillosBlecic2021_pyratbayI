@@ -1,7 +1,8 @@
 #! /usr/bin/env python
-
 import os
+
 import numpy as np
+
 import pyratbay.tools as pt
 import pyratbay.spectrum as ps
 
@@ -34,9 +35,10 @@ def read_obs_file(obs_file, out_path='.', make_filters=True):
         else:
             ffile = f"{out_path}/{data_set}_{inst}_{wave:5.3f}um.dat"
             if make_filters:
+                margin = 0.1 * width
+                dlambda = width / 500.0
                 dummy = ps.tophat(
-                    wave, width, margin=0.1*width, dlambda=width/500,
-                    ffile=ffile)
+                    wave, width, margin=margin, dlambda=dlambda, ffile=ffile)
         wl.append(wave)
         widths.append(width)
         rprs.append(data)
@@ -49,8 +51,10 @@ def read_obs_file(obs_file, out_path='.', make_filters=True):
 
 if __name__ == "__main__":
     data_dir = 'inputs/data/'
-    pfiles = [data_dir+pfile for pfile in os.listdir(data_dir)
-              if pfile.endswith(".csv")]
+    pfiles = [
+        f"{data_dir}{pfile}"
+        for pfile in os.listdir(data_dir)
+        if pfile.endswith(".csv")]
     for pfile in pfiles:
         dummy = read_obs_file(pfile, out_path='inputs/filters')
 

@@ -48,13 +48,13 @@ for cfile in cfiles:
     _, planet, dset = folder.split('_')
     with pt.cd(folder):
         pyrat = pb.run(cfg, init=True, no_logfile=True)
-        mcmc = np.load(pyrat.ret.mcmcfile)
-        post, zchain, zmask = mc3.utils.burn(mcmc)
+        with np.load(pyrat.ret.mcmcfile) as mcmc:
+            post, zchain, zmask = mc3.utils.burn(mcmc)
+            accept_rate = mcmc['acceptance_rate']
         pyrat.ret.posterior = post
         # I want to evaluate less than ~1e5 unique samples:
-        nmax = int(1e5 / (6 * 0.01*mcmc['acceptance_rate']))
+        nmax = int(1e5 / (6 * 0.01 * accept_rate))
         pyrat.percentile_spectrum(nmax)
         pfile = pyrat.ret.mcmcfile.replace('.npz', '.pickle')
         io.save_pyrat(pyrat, pfile)
-        mcmc.close()
 

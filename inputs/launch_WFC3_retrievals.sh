@@ -1,6 +1,6 @@
 # Note about the crazy names:
 # The appendix denotes the fitting parameters:
-# - zero means no fit, non-zero means fit
+# - zero means fixed, non-zero means fitting
 # - the order is wmdmha-mc, which stands for:
 #   (w)ater, carbon (m)onoxide, carbon (d)ioxide, (m)ethane,
 #   (h)ydrogen cyanide, (a)monnia - (m)ean molecular mass, (c)louds

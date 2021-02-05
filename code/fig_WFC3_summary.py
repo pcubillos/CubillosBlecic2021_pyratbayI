@@ -8,7 +8,7 @@ from scipy.ndimage.filters import gaussian_filter1d as gaussf
 plt.ioff()
 
 import pyratbay.atmosphere as pa
-import pyratbay.constants  as pc
+import pyratbay.constants as pc
 import pyratbay.io as io
 import mc3
 
@@ -94,6 +94,7 @@ iCH4 = np.where(specs == 'CH4')[0][0]
 iHCN = np.where(specs == 'HCN')[0][0]
 
 def ZX(params, pyrat):
+    """Compute metals mass fraction relative to solar."""
     q2 = pa.qscale(
         pyrat.atm.qbase, pyrat.mol.name, pyrat.atm.molmodel,
         pyrat.atm.molfree, params[pyrat.ret.imol],
@@ -114,34 +115,33 @@ for i in range(ntargets):
     names[i] = f'{planet} {dset.capitalize()}'
     pickle_file = [f for f in os.listdir(folder) if f.endswith('pickle')][0]
     pyrat = io.load_pyrat(f'{folder}/{pickle_file}')
-    mcmc = np.load(pyrat.ret.mcmcfile)
+    with np.load(pyrat.ret.mcmcfile) as mcmc:
+        post, zchain, zmask = mc3.utils.burn(mcmc)
+        band_model[i] = mcmc['best_model']
+        bestp[i] = mcmc['bestp']
+        texnames[i] = mcmc['texnames']
+        ifree = mcmc['ifree']
 
+    wl[i] = 1.0/(pyrat.spec.wn*pc.um)
     band_wl[i] = 1.0/(pyrat.obs.bandwn*pc.um)
     data[i] = pyrat.obs.data
     uncert[i] = pyrat.obs.uncert
-    band_model[i] = mcmc['best_model']
-    bf = pyrat.ret.mcmcfile.replace('.npz', '_bestfit_spectrum.dat')
-    wn, best_spec[i] = io.read_spectrum(bf)
-    wl[i] = 1.0/(wn*pc.um)
+    best_spec[i], _ = pyrat.eval(bestp[i])
 
-    post, zchain, zmask = mc3.utils.burn(mcmc)
     posteriors[i] = pyrat.ret.posterior = post
-    texnames[i] = mcmc['texnames']
-    bestp[i] = mcmc['bestp']
-    low1[i] = pyrat.ret.spec_low1
-    low2[i] = pyrat.ret.spec_low2
+    low1[i]  = pyrat.ret.spec_low1
+    low2[i]  = pyrat.ret.spec_low2
     high1[i] = pyrat.ret.spec_high1
     high2[i] = pyrat.ret.spec_high2
 
-    u, uind, uinv = np.unique(
-        posteriors[i][:,0], return_index=True, return_inverse=True)
+    u, uind, uinv = np.unique(post[:,0], return_index=True, return_inverse=True)
     nunique = np.size(u)
     # Get mean molecular mass:
     ZX_ratio = np.zeros(nunique, np.double)
     params = pyrat.ret.params
-    imol = np.in1d(mcmc['ifree'], pyrat.ret.imol)
+    imol = np.in1d(ifree, pyrat.ret.imol)
     for k in range(nunique):
-        params[imol] = posteriors[i][uind[k],imol]
+        params[imol] = post[uind[k],imol]
         ZX_ratio[k] = ZX(params, pyrat)
     iN2 = pyrat.ret.pnames.index('log(N2)')
     # Metal mass fraction relative to solar values, i.e., [Z/X]:
@@ -152,7 +152,6 @@ for i in range(ntargets):
     posteriors[i] = roll(posteriors[i], indices=pyrat.ret.imol[:-1])
     bestp[i] = roll(bestp[i], indices=pyrat.ret.imol[:-1])
     texnames[i] = roll(texnames[i], indices=pyrat.ret.imol[:-1])
-    mcmc.close()
 
 
 themes = {
@@ -161,18 +160,18 @@ themes = {
     '$\\log_{10}(f_{\\rm CO2})$': 'black',
     '$\\log_{10}(f_{\\rm CH4})$': 'green',
     '$\\log_{10}(f_{\\rm HCN})$': 'orange',
-}
+    }
 
-line1 = mlines.Line2D([], [], color='blue', linewidth=2.0,
-      label=r'$X_{\rm i} = X_{\rm H2O}$')
-line2 = mlines.Line2D([], [], color='red',  linewidth=2.0,
-      label=r'$X_{\rm i} = X_{\rm CO}$')
-line3 = mlines.Line2D([], [], color='black', linewidth=2.0,
-      label=r'$X_{\rm i} = X_{\rm CO2}$')
-line4 = mlines.Line2D([], [], color='green', linewidth=2.0,
-      label=r'$X_{\rm i} = X_{\rm CH4}$')
-line5 = mlines.Line2D([], [], color='orange', linewidth=2.0,
-      label=r'$X_{\rm i} = X_{\rm HCN}$')
+line1 = mlines.Line2D(
+    [], [], color='blue', linewidth=2.0, label=r'$X_{\rm i} = X_{\rm H2O}$')
+line2 = mlines.Line2D(
+    [], [], color='red',  linewidth=2.0, label=r'$X_{\rm i} = X_{\rm CO}$')
+line3 = mlines.Line2D(
+    [], [], color='black', linewidth=2.0, label=r'$X_{\rm i} = X_{\rm CO2}$')
+line4 = mlines.Line2D(
+    [], [], color='green', linewidth=2.0, label=r'$X_{\rm i} = X_{\rm CH4}$')
+line5 = mlines.Line2D(
+    [], [], color='orange', linewidth=2.0, label=r'$X_{\rm i} = X_{\rm HCN}$')
 
 
 rect  = [0.075, 0.06, 0.985, 0.95]
@@ -203,17 +202,22 @@ for i in range(ntargets):
     ax1 = mc3.plots.subplotter(
         rect, margin1, 1+3*(i%nrows), nx=3, ny=nrows, ymargin=ymargin)
     if low2[i] is not None:
-        ax1.fill_between(wl[i], gaussf(low2[i],sigma2)/pc.percent,
+        ax1.fill_between(
+            wl[i], gaussf(low2[i], sigma2)/pc.percent,
             gaussf(high2[i],sigma2)/pc.percent,
             facecolor="gold", edgecolor="none", alpha=1.0)
-        ax1.fill_between(wl[i], gaussf(low1[i],sigma2)/pc.percent,
+        ax1.fill_between(
+            wl[i], gaussf(low1[i], sigma2)/pc.percent,
             gaussf(high1[i],sigma2)/pc.percent,
             facecolor="orange", edgecolor="none", alpha=1.0)
-    ax1.plot(wl[i], gaussf(best_spec[i], sigma)/pc.percent,
+    ax1.plot(
+        wl[i], gaussf(best_spec[i], sigma)/pc.percent,
         lw=lw, c='red', label='Bestfit model')
-    ax1.plot(band_wl[i], band_model[i]/pc.percent, "o",
+    ax1.plot(
+        band_wl[i], band_model[i]/pc.percent, "o",
         color='orangered', mew=0.25, mec="k", ms=ms)
-    ax1.errorbar(band_wl[i], data[i]/pc.percent, uncert[i]/pc.percent,
+    ax1.errorbar(
+        band_wl[i], data[i]/pc.percent, uncert[i]/pc.percent,
         fmt='o', alpha=0.7, ms=ms, mew=0.25, color='b',
         elinewidth=lw, capthick=lw, zorder=3, label='Data')
     ax1.tick_params(labelsize=fs-1, direction='in', which='both')
@@ -225,34 +229,43 @@ for i in range(ntargets):
         ax1.set_xlim(1.0, 5.5)
     else:
         ax1.set_xlim(1.0, 2.0)
-    ax1.text(0.997, 0.89, names[i], fontsize=fs-1, ha='right',
+    ax1.text(
+        0.997, 0.89, names[i], fontsize=fs-1, ha='right',
         transform=ax1.transAxes)
     if sticks[i] is not None:
         ax1.yaxis.set_major_locator(MultipleLocator(sticks[i]))
     plt.ylabel(r'$(R_{\rm p}/R_{\rm s})^2$  (%)', fontsize=fs)
     # The posteriors:
-    axes = [mc3.plots.subplotter(rect2, margin2, 1+nhist*(i%nrows)+j,
-            nx=nhist, ny=nrows, ymargin=ymargin) for j in range(nhist)]
-    mc3.plots.histogram(posteriors[i][:,:nhist-1],
-        pnames=texnames[i], bestp=bestp[i], ranges=ranges, quantile=0.683,
-        axes=axes, fs=fs, lw=1.2, yscale=None, theme='blue')
+    axes = [
+        mc3.plots.subplotter(
+            rect2, margin2, nhist*(i%nrows)+j+1, nx=nhist, ny=nrows,
+            ymargin=ymargin)
+        for j in range(nhist)]
+    mc3.plots.histogram(
+        posteriors[i][:,:nhist-1], pnames=texnames[i], bestp=bestp[i],
+        ranges=ranges, quantile=0.683, axes=axes, fs=fs, lw=1.2,
+        yscale=None, theme='blue')
     for j in range(nhist-1, len(bestp[i])):
-        mc3.plots.histogram(posteriors[i][:,j],
-            pnames=['$\\log_{10}(X_{\\rm i})$'], bestp=bestp[i][j:j+1],
-            ranges=[ranges[-1]], quantile=0.683, fs=fs, lw=1.2,
-            axes=[axes[-1]], yscale=None, theme=themes[texnames[i][j]])
+        mc3.plots.histogram(
+            posteriors[i][:,j], pnames=['$\\log_{10}(X_{\\rm i})$'],
+            bestp=bestp[i][j:j+1], ranges=[ranges[-1]], quantile=0.683,
+            fs=fs, lw=1.2, axes=[axes[-1]], yscale=None,
+            theme=themes[texnames[i][j]])
     for ax in axes:
         ax.tick_params(labelsize=fs-2, direction='in', which='both')
     if i%nrows == 0:
-        ax1.legend(bbox_to_anchor=(1.0, 1.3), ncol=2, fontsize=fs,
+        ax1.legend(
+            bbox_to_anchor=(1.0, 1.3), ncol=2, fontsize=fs,
             loc='upper right', borderaxespad=0.0)
-        axes[-1].legend(handles=[line1, line2, line3, line4, line5],
+        axes[-1].legend(
+            handles=[line1, line2, line3, line4, line5],
             bbox_to_anchor=(1.0, 1.48), ncol=3, fontsize=fs, borderpad=0.3,
             loc='upper right', borderaxespad=0., handlelength=1.5)
     if (i+1)%nrows == 0 or i == ntargets-1:
         ax1.set_xlabel(r'Wavelength (um)', fontsize=fs)
         plt.savefig(f'plots/WFC3_sample_spectra_histograms_{i/nrows:02.0f}.pdf')
-        plt.savefig(f'plots/WFC3_sample_spectra_histograms_{i/nrows:02.0f}.png',
+        plt.savefig(
+            f'plots/WFC3_sample_spectra_histograms_{i/nrows:02.0f}.png',
             dpi=300)
     else:
         for ax in axes:

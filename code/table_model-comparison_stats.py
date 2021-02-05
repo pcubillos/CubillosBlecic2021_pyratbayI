@@ -7,8 +7,8 @@ from pyratbay.tools import cd
 import mc3
 
 """
-This horrible piece of Python script, takes info from the MCMC
-config and log files and makes a summary table.
+This horrible piece of Python script, takes info from the
+config and MCMC files, and makes a summary LaTeX table.
 """
 
 def sfit(params, data=None, uncert=None, res=False):
@@ -16,6 +16,7 @@ def sfit(params, data=None, uncert=None, res=False):
     if res:
         return (data-params[0])/uncert
     return np.tile(params[0], len(data))
+
 
 # Data files:
 targets = [
@@ -60,7 +61,7 @@ for i in range(ntargets):
     with cd(targets[i]):
         pyrat = pb.run(cfile, init=True, no_logfile=True)
 
-    data   = pyrat.obs.data
+    data = pyrat.obs.data
     uncert = pyrat.obs.uncert
     indparams = [data]
     params = np.array([np.mean(data)])
@@ -79,8 +80,9 @@ with open("stats/flat_fit.dat", "w") as f:
         "Planet                chi-square  red-chisq      BIC\n"
         "----------------------------------------------------\n")
     for i in range(ntargets):
-        f.write(f"{names[i]:20s}  {flat_chisq[i]:10.3f}  "
-                f"{flat_rchisq[i]:9.3f}  {flat_bic[i]:7.3f}\n")
+        f.write(
+            f"{names[i]:20s}  {flat_chisq[i]:10.3f}  "
+            f"{flat_rchisq[i]:9.3f}  {flat_bic[i]:7.3f}\n")
 
 
 
@@ -92,11 +94,11 @@ for j in range(ntargets):
     chisq = np.zeros(nruns+1)
     red_chisq = np.zeros(nruns+1)
     nfree = np.zeros(nruns+1, int)
-    idx   = np.zeros(nruns+1, int)
-    pars  = np.zeros(nruns+1, "|U240")
+    idx = np.zeros(nruns+1, int)
+    pars = np.zeros(nruns+1, "|U240")
     for i in np.arange(nruns):
         with cd(targets[j]):
-            pyrat = pb.run(cfiles[i], True, True)
+            pyrat = pb.run(cfiles[i], init=True, no_logfile=True)
         with np.load(pyrat.ret.mcmcfile) as mcmc:
             bic[i] = mcmc['BIC']
             chisq[i] = mcmc['best_chisq']
@@ -127,9 +129,9 @@ for j in range(ntargets):
 
     ndata = len(pyrat.obs.data)
     red_chisq[-1] = flat_rchisq[j]
-    bic     [-1] = flat_bic[j]
-    nfree   [-1] = 1
-    pars    [-1] = "Flat fit"
+    bic[-1] = flat_bic[j]
+    nfree[-1] = 1
+    pars[-1] = "Flat fit"
     idx[nruns] = nruns + 1
     delta_bic = bic - np.amin(bic)
     # Uncertainty in reduced chi squared:
@@ -168,5 +170,4 @@ with open(f"stats/sample_stats.tex", "w") as f:
         "\\end{table}\n"
         "\\normalsize\n"
         "}\n")
-
 
