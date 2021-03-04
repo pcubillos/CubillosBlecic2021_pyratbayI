@@ -5,52 +5,53 @@ import matplotlib.pyplot as plt
 plt.ioff()
 
 
+# Taken from stats/sample_stats.tex:
+pyrat = [
+    'run_GJ-0436b_tsiaras/MCMC_GJ-0436b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    'run_HATP-03b_tsiaras/MCMC_HATP-03b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    'run_HATP-17b_tsiaras/MCMC_HATP-17b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    'run_HATP-18b_tsiaras/MCMC_HATP-18b_tsiaras_1.0-2.0um_w00000-m0.npz',
+    'run_HATP-32b_tsiaras/MCMC_HATP-32b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    'run_HATP-38b_tsiaras/MCMC_HATP-38b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    'run_HATP-41b_tsiaras/MCMC_HATP-41b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    'run_HD-149026b_tsiaras/MCMC_HD-149026b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    'run_K2-018b_tsiaras/MCMC_K2-018b_tsiaras_1.0-2.0um_w00000-m0.npz',
+    'run_WASP-029b_tsiaras/MCMC_WASP-029b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    'run_WASP-043b_tsiaras/MCMC_WASP-043b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    'run_WASP-063b_tsiaras/MCMC_WASP-063b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    'run_WASP-067b_tsiaras/MCMC_WASP-067b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    'run_WASP-069b_tsiaras/MCMC_WASP-069b_tsiaras_1.0-2.0um_w00000-m0.npz',
+    'run_WASP-074b_tsiaras/MCMC_WASP-074b_tsiaras_1.0-2.0um_w00000-m0.npz',
+    'run_WASP-080b_tsiaras/MCMC_WASP-080b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    'run_WASP-101b_tsiaras/MCMC_WASP-101b_tsiaras_1.0-2.0um_w00000-m0.npz',
+    None,
+    'run_XO-1b_tsiaras/MCMC_XO-1b_tsiaras_1.0-2.0um_w00000-0c.npz',
+    ]
+
+other = [
+    None,
+    None,
+    None,
+    None,
+    'run_HATP-32b_damiano/MCMC_HATP-32b_damiano_1.0-2.0um_w00000-0c.npz',
+    'run_HATP-38b_bruno/MCMC_HATP-38b_bruno_1.0-2.0um_w00000-0c.npz',
+    None,
+    None,
+    'run_K2-018b_benneke/MCMC_K2-018b_benneke_1.0-5.5um_w00000-0c.npz',
+    None,
+    'run_WASP-043b_stevenson/MCMC_WASP-043b_stevenson_1.0-5.5um_w00000-0c.npz',
+    'run_WASP-063b_kilpatrick/MCMC_WASP-063b_kilpatrick_1.0-2.0um_w000h0-0c.npz',
+    'run_WASP-067b_bruno/MCMC_WASP-067b_bruno_1.0-2.0um_w00000-0c.npz',
+    None,
+    None,
+    None,
+    'run_WASP-101b_wakeford/MCMC_WASP-101b_wakeford_1.0-2.0um_w00000-m0.npz',
+    'run_WASP-103b_kreidberg/MCMC_WASP-103b_kreidberg_1.0-5.5um_w00000-0c.npz',
+    None,
+    ]
+
+
 def main():
-    # Taken from stats/sample_stats.tex:
-    pyrat = [
-        'run_GJ-0436b_tsiaras/MCMC_GJ-0436b_tsiaras_1.0-2.0um_w00000-0c.npz',
-        'run_HATP-03b_tsiaras/MCMC_HATP-03b_tsiaras_1.0-2.0um_w00000-0c.npz',
-        'run_HATP-17b_tsiaras/MCMC_HATP-17b_tsiaras_1.0-2.0um_w00000-0c.npz',
-        'run_HATP-18b_tsiaras/MCMC_HATP-18b_tsiaras_1.0-2.0um_w00000-m0.npz',
-        'run_HATP-32b_tsiaras/MCMC_HATP-32b_tsiaras_1.0-2.0um_w00000-0c.npz',
-        'run_HATP-38b_tsiaras/MCMC_HATP-38b_tsiaras_1.0-2.0um_w00000-0c.npz',
-        'run_HATP-41b_tsiaras/MCMC_HATP-41b_tsiaras_1.0-2.0um_w00000-0c.npz',
-        'run_HD-149026b_tsiaras/MCMC_HD-149026b_tsiaras_1.0-2.0um_w00000-0c.npz',
-        'run_K2-018b_tsiaras/MCMC_K2-018b_tsiaras_1.0-2.0um_w00000-m0.npz',
-        'run_WASP-029b_tsiaras/MCMC_WASP-029b_tsiaras_1.0-2.0um_w00000-0c.npz',
-        'run_WASP-043b_tsiaras/MCMC_WASP-043b_tsiaras_1.0-2.0um_w00000-0c.npz',
-        'run_WASP-063b_tsiaras/MCMC_WASP-063b_tsiaras_1.0-2.0um_w00000-0c.npz',
-        'run_WASP-067b_tsiaras/MCMC_WASP-067b_tsiaras_1.0-2.0um_w00000-0c.npz',
-        'run_WASP-069b_tsiaras/MCMC_WASP-069b_tsiaras_1.0-2.0um_w00000-m0.npz',
-        'run_WASP-074b_tsiaras/MCMC_WASP-074b_tsiaras_1.0-2.0um_w00000-m0.npz',
-        'run_WASP-080b_tsiaras/MCMC_WASP-080b_tsiaras_1.0-2.0um_w00000-0c.npz',
-        'run_WASP-101b_tsiaras/MCMC_WASP-101b_tsiaras_1.0-2.0um_w00000-m0.npz',
-        None,
-        'run_XO-1b_tsiaras/MCMC_XO-1b_tsiaras_1.0-2.0um_w00000-0c.npz',
-        ]
-
-    other = [
-        None,
-        None,
-        None,
-        None,
-        'run_HATP-32b_damiano/MCMC_HATP-32b_damiano_1.0-2.0um_w00000-0c.npz',
-        'run_HATP-38b_bruno/MCMC_HATP-38b_bruno_1.0-2.0um_w00000-0c.npz',
-        None,
-        None,
-        'run_K2-018b_benneke/MCMC_K2-018b_benneke_1.0-5.5um_w00000-0c.npz',
-        None,
-        'run_WASP-043b_stevenson/MCMC_WASP-043b_stevenson_1.0-5.5um_w00000-0c.npz',
-        'run_WASP-063b_kilpatrick/MCMC_WASP-063b_kilpatrick_1.0-2.0um_w000h0-0c.npz',
-        'run_WASP-067b_bruno/MCMC_WASP-067b_bruno_1.0-2.0um_w00000-0c.npz',
-        None,
-        None,
-        None,
-        'run_WASP-101b_wakeford/MCMC_WASP-101b_wakeford_1.0-2.0um_w00000-m0.npz',
-        'run_WASP-103b_kreidberg/MCMC_WASP-103b_kreidberg_1.0-5.5um_w00000-0c.npz',
-        None,
-        ]
-
     nplanets = len(pyrat)
     names = [None] * nplanets
     for i in range(nplanets):
