@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 from matplotlib.ticker import MultipleLocator, NullFormatter, ScalarFormatter
 from scipy.ndimage.filters import gaussian_filter1d as gaussf
-plt.ioff()
 
 import pyratbay.atmosphere as pa
 import pyratbay.constants as pc
@@ -42,17 +41,17 @@ cfiles = [
     'run_K2-018b_tsiaras/mcmc_K2-018b_tsiaras_w00000-mc.cfg',
     'run_WASP-029b_tsiaras/mcmc_WASP-029b_tsiaras_w00000-mc.cfg',
     'run_WASP-043b_stevenson/mcmc_WASP-043b_stevenson_wmdm00-mc.cfg',
-
     'run_WASP-043b_tsiaras/mcmc_WASP-043b_tsiaras_w00000-mc.cfg',
+
     'run_WASP-063b_kilpatrick/mcmc_WASP-063b_kilpatrick_w000h0-mc.cfg',
     'run_WASP-063b_tsiaras/mcmc_WASP-063b_tsiaras_w000h0-mc.cfg',
     'run_WASP-067b_bruno/mcmc_WASP-067b_bruno_w00000-mc.cfg',
     'run_WASP-067b_tsiaras/mcmc_WASP-067b_tsiaras_w00000-mc.cfg',
     'run_WASP-069b_tsiaras/mcmc_WASP-069b_tsiaras_w00000-mc.cfg',
     'run_WASP-074b_tsiaras/mcmc_WASP-074b_tsiaras_w00000-mc.cfg',
-
     'run_WASP-080b_tsiaras/mcmc_WASP-080b_tsiaras_w00000-mc.cfg',
     'run_WASP-101b_tsiaras/mcmc_WASP-101b_tsiaras_w00000-mc.cfg',
+
     'run_WASP-101b_wakeford/mcmc_WASP-101b_wakeford_w00000-mc.cfg',
     'run_WASP-103b_kreidberg/mcmc_WASP-103b_kreidberg_wmdm00-mc.cfg',
     'run_XO-1b_tsiaras/mcmc_XO-1b_tsiaras_w00000-mc.cfg',
@@ -74,6 +73,7 @@ low1 = [None for _ in range(ntargets)]
 low2 = [None for _ in range(ntargets)]
 high1 = [None for _ in range(ntargets)]
 high2 = [None for _ in range(ntargets)]
+temp_ranges = [None for _ in range(ntargets)]
 
 # Mass fractions (Asplund et al. 2009):
 # X + Y + Z = mu, with:
@@ -127,7 +127,7 @@ for i in range(ntargets):
     data[i] = pyrat.obs.data
     uncert[i] = pyrat.obs.uncert
     best_spec[i], _ = pyrat.eval(bestp[i])
-
+    temp_ranges[i] = (pyrat.ret.pmin[0], pyrat.ret.pmax[0])
     posteriors[i] = pyrat.ret.posterior = post
     low1[i]  = pyrat.ret.spec_low1
     low2[i]  = pyrat.ret.spec_low2
@@ -174,18 +174,16 @@ line5 = mlines.Line2D(
     [], [], color='orange', linewidth=2.0, label=r'$X_{\rm i} = X_{\rm HCN}$')
 
 
-rect  = [0.075, 0.06, 0.985, 0.95]
-rect2 = [0.36,  0.06, 0.985, 0.95]
+rect  = [0.075, 0.045, 0.985, 0.95]
+rect2 = [0.36,  0.045, 0.985, 0.95]
 margin1 = 0.05
 margin2 = 0.01
 ymargin = 0.035
 sigma = 25.0
-sigma2 = 25.0
 fs = 9.0
 lw = 1.0
 ms = 4.0
 nhist = 5
-nrows = 7
 logxticks = [1.0, 1.4, 2.0, 3.0, 5.0]
 ranges = [(100, 3000), None, (-6,3), (-6,2), (-12,0)]
 
@@ -194,21 +192,26 @@ sticks[ 3] = 0.03
 sticks[ 9] = 0.005
 sticks[13] = 0.02
 
+new_page = np.array([0, 7, 15, 23, 26])
+ny = 8
+
 for i in range(ntargets):
-    if i%nrows == 0:
-        fig = plt.figure(10+i//nrows, (8.2, 10))
+    page = sum(i >= new_page) - 1
+    pos = i - new_page[page]
+    if i in new_page:
+        fig = plt.figure(20+page, (8.2, 10.8))
         plt.clf()
     # The spectra:
     ax1 = mc3.plots.subplotter(
-        rect, margin1, 1+3*(i%nrows), nx=3, ny=nrows, ymargin=ymargin)
+        rect, margin1, 1+3*pos, nx=3, ny=ny, ymargin=ymargin)
     if low2[i] is not None:
         ax1.fill_between(
-            wl[i], gaussf(low2[i], sigma2)/pc.percent,
-            gaussf(high2[i],sigma2)/pc.percent,
+            wl[i], gaussf(low2[i], sigma)/pc.percent,
+            gaussf(high2[i],sigma)/pc.percent,
             facecolor="gold", edgecolor="none", alpha=1.0)
         ax1.fill_between(
-            wl[i], gaussf(low1[i], sigma2)/pc.percent,
-            gaussf(high1[i],sigma2)/pc.percent,
+            wl[i], gaussf(low1[i], sigma)/pc.percent,
+            gaussf(high1[i],sigma)/pc.percent,
             facecolor="orange", edgecolor="none", alpha=1.0)
     ax1.plot(
         wl[i], gaussf(best_spec[i], sigma)/pc.percent,
@@ -234,13 +237,13 @@ for i in range(ntargets):
         transform=ax1.transAxes)
     if sticks[i] is not None:
         ax1.yaxis.set_major_locator(MultipleLocator(sticks[i]))
-    plt.ylabel(r'$(R_{\rm p}/R_{\rm s})^2$  (%)', fontsize=fs)
+    plt.ylabel(r'$(R_{\rm p}/R_{\rm s})^2$ (%)', fontsize=fs)
     # The posteriors:
     axes = [
         mc3.plots.subplotter(
-            rect2, margin2, nhist*(i%nrows)+j+1, nx=nhist, ny=nrows,
-            ymargin=ymargin)
-        for j in range(nhist)]
+            rect2, margin2, nhist*pos+k+1, nx=nhist, ny=ny, ymargin=ymargin)
+        for k in range(nhist)]
+    ranges[0] = temp_ranges[i]
     mc3.plots.histogram(
         posteriors[i][:,:nhist-1], pnames=texnames[i], bestp=bestp[i],
         ranges=ranges, quantile=0.683, axes=axes, fs=fs, lw=1.2,
@@ -253,21 +256,19 @@ for i in range(ntargets):
             theme=themes[texnames[i][j]])
     for ax in axes:
         ax.tick_params(labelsize=fs-2, direction='in', which='both')
-    if i%nrows == 0:
+    if i in new_page:
         ax1.legend(
             bbox_to_anchor=(1.0, 1.3), ncol=2, fontsize=fs,
             loc='upper right', borderaxespad=0.0)
         axes[-1].legend(
             handles=[line1, line2, line3, line4, line5],
-            bbox_to_anchor=(1.0, 1.48), ncol=3, fontsize=fs, borderpad=0.3,
+            bbox_to_anchor=(1.0, 1.55), ncol=3, fontsize=fs, borderpad=0.3,
             loc='upper right', borderaxespad=0., handlelength=1.5)
-    if (i+1)%nrows == 0 or i == ntargets-1:
-        ax1.set_xlabel(r'Wavelength (um)', fontsize=fs)
-        plt.savefig(f'plots/WFC3_sample_spectra_histograms_{i/nrows:02.0f}.pdf')
+    if i+1 in new_page:
+        ax1.set_xlabel('Wavelength (um)', fontsize=fs)
+        plt.savefig(f'plots/WFC3_sample_spectra_histograms_0{page+1}.pdf')
         plt.savefig(
-            f'plots/WFC3_sample_spectra_histograms_{i/nrows:02.0f}.png',
-            dpi=300)
+            f'plots/WFC3_sample_spectra_histograms_0{page+1}.png', dpi=300)
     else:
         for ax in axes:
             ax.set_xlabel('')
-

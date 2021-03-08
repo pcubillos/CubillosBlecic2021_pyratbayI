@@ -2,7 +2,6 @@ import os
 
 import numpy as np
 import matplotlib.pyplot as plt
-#plt.ioff()
 
 import pyratbay as pb
 import pyratbay.atmosphere as pa
@@ -20,6 +19,7 @@ iH   = np.where(specs == 'H')[0][0]
 iH2O = np.where(specs == 'H2O')[0][0]
 iCH4 = np.where(specs == 'CH4')[0][0]
 iHCN = np.where(specs == 'HCN')[0][0]
+
 
 def ZX(params, pyrat):
     Zsun = 0.0134  # Asplund et al. 2009
@@ -40,33 +40,15 @@ def ZX(params, pyrat):
 def main():
     # Only those with ADI > 3:
     cfiles = [
-        #'run_GJ-0436b_tsiaras/mcmc_GJ-0436b_tsiaras_w00000-0c.cfg',
-        #'run_HATP-03b_tsiaras/mcmc_HATP-03b_tsiaras_w00000-0c.cfg',
-        #'run_HATP-17b_tsiaras/mcmc_HATP-17b_tsiaras_w00000-0c.cfg',
-        'run_HATP-18b_tsiaras/mcmc_HATP-18b_tsiaras_w00000-m0.cfg',
-        #'run_HATP-32b_damiano/mcmc_HATP-32b_damiano_w00000-0c.cfg',
+        'run_HATP-18b_tsiaras/mcmc_HATP-18b_tsiaras_w00000-0c.cfg',
         'run_HATP-32b_tsiaras/mcmc_HATP-32b_tsiaras_w00000-0c.cfg',
         'run_HATP-38b_bruno/mcmc_HATP-38b_bruno_w00000-0c.cfg',
-
-        #'run_HATP-38b_tsiaras/mcmc_HATP-38b_tsiaras_w00000-0c.cfg',
         'run_HATP-41b_tsiaras/mcmc_HATP-41b_tsiaras_w00000-0c.cfg',
-        #'run_HD-149026b_tsiaras/mcmc_HD-149026b_tsiaras_w00000-0c.cfg',
         'run_K2-018b_benneke/mcmc_K2-018b_benneke_w00000-0c.cfg',
-        #'run_K2-018b_tsiaras/mcmc_K2-018b_tsiaras_w00000-m0.cfg',
-        #'run_WASP-029b_tsiaras/mcmc_WASP-029b_tsiaras_w00000-0c.cfg',
+
         'run_WASP-043b_stevenson/mcmc_WASP-043b_stevenson_w00000-0c.cfg',
-
-        #'run_WASP-043b_tsiaras/mcmc_WASP-043b_tsiaras_w00000-0c.cfg',
         'run_WASP-063b_kilpatrick/mcmc_WASP-063b_kilpatrick_w000h0-0c.cfg',
-        #'run_WASP-063b_tsiaras/mcmc_WASP-063b_tsiaras_w00000-0c.cfg',
-        #'run_WASP-067b_bruno/mcmc_WASP-067b_bruno_w00000-0c.cfg',
-        #'run_WASP-067b_tsiaras/mcmc_WASP-067b_tsiaras_w00000-0c.cfg',
-        'run_WASP-069b_tsiaras/mcmc_WASP-069b_tsiaras_w00000-m0.cfg',
-        #'run_WASP-074b_tsiaras/mcmc_WASP-074b_tsiaras_w00000-m0.cfg',
-
-        #'run_WASP-080b_tsiaras/mcmc_WASP-080b_tsiaras_w00000-0c.cfg',
-        #'run_WASP-101b_tsiaras/mcmc_WASP-101b_tsiaras_w00000-m0.cfg',
-        #'run_WASP-101b_wakeford/mcmc_WASP-101b_wakeford_w00000-m0.cfg',
+        'run_WASP-069b_tsiaras/mcmc_WASP-069b_tsiaras_w00000-0c.cfg',
         'run_WASP-103b_kreidberg/mcmc_WASP-103b_kreidberg_w00000-0c.cfg',
         'run_XO-1b_tsiaras/mcmc_XO-1b_tsiaras_w00000-0c.cfg',
         ]
@@ -87,30 +69,44 @@ def main():
                 pyrat.phy.tstar, pyrat.phy.rstar, pyrat.phy.smaxis)
             with np.load(pyrat.ret.mcmcfile) as mcmc:
                 posteriors[i], zchain, zmask = mc3.utils.burn(mcmc)
-                imol = np.in1d(mcmc['ifree'], pyrat.ret.imol)
-        # Get mean molecular mass:
-        if 'log(N2)' in pyrat.ret.pnames:
-            u, uind, uinv = np.unique(
-                posteriors[i][:,0], return_index=True, return_inverse=True)
-            nunique = np.size(u)
-            ZX_ratio = np.zeros(nunique, np.double)
-            params = pyrat.ret.params
-            for k in range(nunique):
-                params[imol] = posteriors[i][uind[k],imol]
-                ZX_ratio[k] = ZX(params, pyrat)
-            iN2 = pyrat.ret.pnames.index('log(N2)')
-            # Metal mass fraction relative to solar values, i.e., [Z/X]:
-            posteriors[i][:,iN2] = ZX_ratio[uinv]
 
 
     tposteriors = np.array([post[:,0] for post in posteriors])
     ci1 = np.zeros((2,ntargets))
-    ci2 = np.zeros((2,ntargets))
     for i in range(ntargets):
         pdf, xpdf, HPDmin = mc3.stats.cred_region(tposteriors[i])
         ci1[:,i] = -np.amin(xpdf[pdf>HPDmin]), np.amax(xpdf[pdf>HPDmin])
-        pdf, xpdf, HPDmin = mc3.stats.cred_region(
-            pdf=pdf, xpdf=xpdf, quantile=0.9545)
+
+
+    # Print some stats:
+    decimals = [0, 3, 2, 2, 2, 2]
+    split = [None, None, -4, None, None, None, None, -2, -4, None]
+
+    table = []
+    for j,posterior in enumerate(posteriors):
+        texts = []
+        for i in range(len(posterior.T)):
+            dec = decimals[i]
+            text = ''
+            pdf, xpdf, hpd_min = mc3.stats.cred_region(posterior[:,i])
+            if i == 2 and split[j] is not None:
+                x = xpdf[xpdf < split[j]]
+                p = pdf[xpdf < split[j]]
+                mode = x[np.argmax(p)]
+                lo =   mode - np.amin(x[p>hpd_min])
+                hi = -(mode - np.amax(x[p>hpd_min]))
+                text = f'${mode:.{dec}f}_{{-{lo:.{dec}f}}}^{{+{hi:.{dec}f}}}$ and '
+                pdf = pdf[xpdf > split[j]]
+                xpdf = xpdf[xpdf > split[j]]
+            mode = xpdf[np.argmax(pdf)]
+            lo =   mode - np.amin(xpdf[pdf>hpd_min])
+            hi = -(mode - np.amax(xpdf[pdf>hpd_min]))
+            text += f'${mode:.{dec}f}_{{-{lo:.{dec}f}}}^{{+{hi:.{dec}f}}}$'
+            texts.append(text)
+        text = "  &  ".join(texts)
+        table.append(text)
+    table_text = " \\\\\n".join(table)
+    print(table_text)
 
     # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     # Temperatures:
@@ -139,8 +135,8 @@ def main():
 
     # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     # H2O abundances:
-    iH2O = 2
-    H2O_posts = [post[:,iH2O] for post in posteriors]
+    idx_H2O = 2
+    H2O_posts = [post[:,idx_H2O] for post in posteriors]
 
     nx = 1
     ny = ntargets

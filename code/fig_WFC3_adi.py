@@ -135,12 +135,8 @@ def main():
 
     plt.axvline( 0, dashes=(7,2,2,2), lw=1.5, color="0.8", zorder=-10)
     plt.axvline( 3, ls="--", lw=1.5, color="0.8", zorder=-10)
-    plt.axvline(11, ls="--", lw=1.5, color="0.8", zorder=-10)
     plt.text(
         2.9, 17, r"3$\sigma$", ha='right', va='center', rotation=90,
-        color="0.7", fontsize=fs)
-    plt.text(
-        11, 17, r"5$\sigma$", ha='right', va='center', rotation=90,
         color="0.7", fontsize=fs)
     for i in range(10):
         plt.axhline(2*i+0.5, c='0.95', lw=1.0)
