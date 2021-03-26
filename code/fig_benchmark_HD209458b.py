@@ -65,8 +65,8 @@ for irow in range(1, npars1):
         ran = None
         if ranges1[icol] is not None:
             ran = [ranges1[icol], ranges1[irow]]
-        h, x, y = np.histogram2d(posterior1[:,icol], posterior1[:,irow],
-            bins=nbins, range=ran)
+        h, x, y = np.histogram2d(
+            posterior1[:,icol], posterior1[:,irow], bins=nbins, range=ran)
         hist1.append(h.T)
         xran1.append(x)
         yran1.append(y)
@@ -163,7 +163,7 @@ rect3 = [0.67, 0.51, 1.02, 0.76]
 rect4 = [0.115, 0.328, 0.84, 0.823]
 rect5 = [0.02, 0.03, 0.99, 0.28]
 
-palette = copy.copy(plt.cm.viridis_r)
+palette = copy(plt.cm.viridis_r)
 palette.set_under(color='w')
 palette.set_bad(color='w')
 p2019_col = pb.plots.alphatize('r', 0.6, 'darkred')

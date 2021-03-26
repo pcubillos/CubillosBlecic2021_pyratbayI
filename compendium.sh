@@ -2,7 +2,6 @@
 topdir=`pwd`
 
 # Clone (download) the necessary code:
-pip install 'mc3>=3.0.2'
 pip install 'pyratbay>=0.9.1'
 
 # Install petitRADTRANS:
