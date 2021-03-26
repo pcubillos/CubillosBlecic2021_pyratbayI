@@ -34,7 +34,7 @@ cd $topdir
 git clone https://github.com/pcubillos/rate
 
 
-# Download exomol repack data:  (TBD: upload files)
+# Download exomol repack data:
 cd $topdir/inputs/opacity
 wget -i wget_repack.txt
 
