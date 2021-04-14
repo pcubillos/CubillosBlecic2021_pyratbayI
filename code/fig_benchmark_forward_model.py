@@ -135,7 +135,7 @@ temp2 = nc.guillot_global(
 atmosphere.calc_flux(temp2, abundances, gravity, mu)
 petit_emission = atmosphere.flux*pc.c
 
-pyrat.od.path = 'eclipse'
+pyrat.od.rt_path = 'emission'
 pyrat.run(temp=temp2, radius=atmosphere.radius)
 pyrat_emission = np.copy(pyrat.spec.spectrum)
 
@@ -167,7 +167,7 @@ petit_methane_emission = atmosphere.flux*pc.c
 pyrat = pb.run('petit_spectrum_CH4-Na-K.cfg')
 pyrat_wl = 1/(pyrat.spec.wn*pc.um)
 pyrat_methane = np.sqrt(pyrat.spec.spectrum) * pyrat.phy.rstar / pc.rjup
-pyrat.od.path = 'eclipse'
+pyrat.od.rt_path = 'emission'
 pyrat.run(temp=temp2, radius=atmosphere.radius)
 pyrat_methane_emission = np.copy(pyrat.spec.spectrum)
 
