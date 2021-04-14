@@ -59,7 +59,7 @@ flat_bic = np.zeros(ntargets)
 for i in range(ntargets):
     cfile = [f for f in os.listdir(targets[i]) if f.endswith(".cfg")][0]
     with cd(targets[i]):
-        pyrat = pb.run(cfile, init=True, no_logfile=True)
+        pyrat = pb.run(cfile, run_step='dry', no_logfile=True)
 
     data = pyrat.obs.data
     uncert = pyrat.obs.uncert
@@ -98,7 +98,7 @@ for j in range(ntargets):
     pars = np.zeros(nruns+1, "|U240")
     for i in np.arange(nruns):
         with cd(targets[j]):
-            pyrat = pb.run(cfiles[i], init=True, no_logfile=True)
+            pyrat = pb.run(cfiles[i], run_step='init', no_logfile=True)
         with np.load(pyrat.ret.mcmcfile) as mcmc:
             bic[i] = mcmc['BIC']
             chisq[i] = mcmc['best_chisq']

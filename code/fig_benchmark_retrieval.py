@@ -6,12 +6,12 @@ from matplotlib.ticker import NullFormatter, ScalarFormatter, MultipleLocator
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter1d as gaussf
 import scipy.interpolate as si
-
-import pyratbay as pb
-import pyratbay.constants as pc
 import mc3.plots as mp
 import mc3.utils as mu
 import mc3.stats as ms
+
+import pyratbay as pb
+import pyratbay.constants as pc
 
 sys.path.append('../code')
 import taurex_ariel_sim as tas
@@ -35,8 +35,8 @@ def adjust_spines(ax, spines):
 
 def posterior_pt(posterior, tmodel, tpars, ifree, pressure):
     nlayers = len(pressure)
-    u, uind, uinv = np.unique(posterior[:,0], return_index=True,
-        return_inverse=True)
+    u, uind, uinv = np.unique(
+        posterior[:,0], return_index=True, return_inverse=True)
     nsamples = len(u)
 
     # Evaluate posterior PT profiles:
@@ -77,7 +77,8 @@ transmission = [
     'mcmc_transmission_WASP-76b.cfg',
     ]
 nplanets = len(transmission)
-tnames = [mc_file.split('_')[-1].split('.')[0]
+tnames = [
+    mc_file.split('_')[-1].split('.')[0]
     for mc_file in transmission]
 
 planet_data = np.loadtxt(
@@ -86,18 +87,19 @@ planets = list(planet_data[:,0])
 ifit = [6, 4, 7, 8, 9, 10, 11]
 params = np.array(planet_data[:,ifit], np.double)
 
-nobs = 52  # Number of Ariel observing filters
-tr_npars = 7
+pyrat = pb.run(transmission[0], run_step='dry', no_logfile=True)
+nobs = len(pyrat.obs.data)
+tr_npars = len(pyrat.ret.params)
+
 tr_data = np.zeros((nplanets, nobs))
 tr_uncert = np.zeros((nplanets, nobs))
-
 tr_bestfit = [None for _ in range(nplanets)]
 tr_true = np.zeros((nplanets, tr_npars))
 tr_best = np.zeros((nplanets, tr_npars))
 tr_posterior = np.zeros((nplanets, tr_npars), object)
 
 for i in range(nplanets):
-    pyrat = pb.run(transmission[i], init=True, no_logfile=True)
+    pyrat = pb.run(transmission[i], run_step='init', no_logfile=True)
     tr_data[i] = pyrat.obs.data
     tr_uncert[i] = pyrat.obs.uncert
     with np.load(pyrat.ret.mcmcfile) as mcmc:
@@ -110,6 +112,8 @@ for i in range(nplanets):
     j = planets.index(tnames[i])
     tr_true[i] = params[j]
 
+
+nlayers = pyrat.atm.nlayers
 
 tr_PDF  = [None for _ in range(nplanets)]
 tr_Xpdf = [None for _ in range(nplanets)]
@@ -139,11 +143,13 @@ emission = [
     'mcmc_emission_WASP-12b.cfg',
     ]
 nplanets = len(emission)
-enames = [mc_file.split('_')[-1].split('.')[0]
+enames = [
+    mc_file.split('_')[-1].split('.')[0]
     for mc_file in emission]
 
-em_npars = 8
-nlayers = 22
+pyrat = pb.run(emission[0], run_step='dry', no_logfile=True)
+em_npars = sum(pyrat.ret.pstep > 0)
+
 em_true = np.zeros((nplanets, em_npars))
 em_best = np.zeros((nplanets, em_npars))
 em_posterior = np.zeros((nplanets, em_npars), object)
@@ -159,11 +165,10 @@ em_data = np.zeros((nplanets, nobs))
 em_uncert = np.zeros((nplanets, nobs))
 em_bestfit = [None for _ in range(nplanets)]
 
-for i, mc_file in enumerate(emission):
-    pyrat = pb.run(mc_file, init=True, no_logfile=True)
+for i in range(nplanets):
+    pyrat = pb.run(emission[i], run_step='init', no_logfile=True)
     em_data[i] = pyrat.obs.data
     em_uncert[i] = pyrat.obs.uncert
-
     with np.load(pyrat.ret.mcmcfile) as mcmc:
         ifree = mcmc['ifree']
         em_texnames = mcmc['texnames'][ifree]
@@ -179,8 +184,6 @@ for i, mc_file in enumerate(emission):
     em_bestfit[i], _ = pyrat.eval(bestp)
     em_bestfit[i] *= (rplanet/pyrat.phy.rstar)**2 / pyrat.spec.starflux
 
-    #ifree = pyrat.ret.pstep[pyrat.ret.itemp] > 0
-    #itemp_free = np.arange(np.sum(ifree))
     itemp_free = [itemp in ifree for itemp in pyrat.ret.itemp]
     ntemp_free = np.sum(itemp_free)
     tp_post[i] = posterior_pt(
@@ -223,7 +226,8 @@ for i in range(nplanets):
     axes.append(ax)
     if tr_bestfit[i] is not None:
         plt.plot(wl, gaussf(tr_bestfit[i], sigma)/pc.percent, lw=lw, c='orange')
-    plt.errorbar(bandwl, tr_data[i]/pc.percent, tr_uncert[i]/pc.percent,
+    plt.errorbar(
+        bandwl, tr_data[i]/pc.percent, tr_uncert[i]/pc.percent,
         fmt='o', alpha=0.7, ms=1.5, color='b', ecolor='0.3',
         elinewidth=lw, capthick=lw, zorder=3)
     yran = ax.get_ylim()
@@ -233,8 +237,8 @@ for i in range(nplanets):
     ax.get_xaxis().set_major_formatter(ScalarFormatter())
     ax.set_xticks(logxticks)
     plt.xlim(np.amin(wl), np.amax(wl))
-    plt.text(0.03, 0.86, tnames[i], fontsize=fs-1, ha='left',
-        transform=ax.transAxes)
+    plt.text(
+        0.03, 0.86, tnames[i], fontsize=fs-1, ha='left', transform=ax.transAxes)
     if i%3 == 0:
         plt.ylabel(r'$(R_{\rm p}/R_{\rm s})^2$  (%)', fontsize=fs)
     if i >= 9:
@@ -244,7 +248,8 @@ for i in range(nplanets):
     axes.append(ax)
     if em_bestfit[i] is not None:
         plt.plot(wl, gaussf(em_bestfit[i], sigma)/pc.ppt,lw=lw, c='orange')
-    plt.errorbar(bandwl, em_data[i]/pc.ppt, em_uncert[i]/pc.ppt,
+    plt.errorbar(
+        bandwl, em_data[i]/pc.ppt, em_uncert[i]/pc.ppt,
         fmt='o', alpha=0.7, ms=1.5, color='b', ecolor='0.3',
         elinewidth=lw, capthick=lw, zorder=3)
     yran = ax.get_ylim()
@@ -254,8 +259,8 @@ for i in range(nplanets):
     ax.set_xticks(logxticks)
     ax.tick_params(labelsize=fs-1, direction='in', which='both')
     plt.xlim(np.amin(wl), np.amax(wl))
-    plt.text(0.03, 0.86, enames[i], fontsize=fs-1, ha='left',
-        transform=ax.transAxes)
+    plt.text(
+        0.03, 0.86, enames[i], fontsize=fs-1, ha='left', transform=ax.transAxes)
     if i%3 == 0:
         ax.set_ylabel(r'$F_{\rm p}/F_{\rm s}$ (ppt)', fontsize=fs)
     if i >= 9:
@@ -270,8 +275,6 @@ axes[15].yaxis.set_major_locator(MultipleLocator(0.5))
 axes[19].yaxis.set_major_locator(MultipleLocator(1.0))
 axes[20].yaxis.set_major_locator(MultipleLocator(0.25))
 plt.savefig('../plots/pyratbay-taurex_ret_spectra_comparision.pdf')
-# Lower temperature+higher radius(p0) flattens IR bands
-# (at constant abundances)
 
 
 
@@ -330,12 +333,14 @@ for p in range(tr_npars):
     for i in range(nplanets):
         ecol = 'k' if width[p,i] == 0 else 'b'
         axes[p,i] = ax = fig.add_subplot(tr_npars, 12, i+1 + 12*p)
-        vals, bins, h = ax.hist(tr_posterior[i,p], bins=25, zorder=0,
+        vals, bins, h = ax.hist(
+            tr_posterior[i,p], bins=25, zorder=0,
             orientation='horizontal', edgecolor=ecol, **hkw)
         vals = np.r_[0, vals, 0]
         bins = np.r_[bins[0] - (bins[1]-bins[0]), bins]
         f = si.interp1d(bins+0.5*(bins[1]-bins[0]), vals, kind='nearest')
-        ax.fill_betweenx(tr_Xpdf[i][p], 0, f(tr_Xpdf[i][p]),
+        ax.fill_betweenx(
+            tr_Xpdf[i][p], 0, f(tr_Xpdf[i][p]),
             where=tr_PDF[i][p]>=tr_HPDmin[i,p], facecolor='0.75',
             edgecolor='none',
             interpolate=False, zorder=-2)
@@ -427,14 +432,15 @@ ranges[6,4] = -4.2, -0.95
 ranges[6,6] = -4.5, -1.9
 ranges[7,4] = -7.2, -4.9
 
-fig = plt.figure(11, (8.2, 10))
+
+
+plt.figure(11, (8.2, 10))
 plt.clf()
-axes = np.empty((em_npars, nplanets), object)
 plt.subplots_adjust(0.07, 0.05, 0.99, 0.99, hspace=0.07, wspace=0.0)
-for p in range(3,em_npars):
+for p in range(3, em_npars):
     for i in range(nplanets):
         ecol = 'k' if width[p,i] == 0 else 'b'
-        axes[p,i] = ax = fig.add_subplot(em_npars, 12, i+1 + 12*(p-3))
+        ax = plt.subplot(em_npars, 12, i+1 + 12*(p-3))
         vals, bins, h = ax.hist(
             em_posterior[i,p], bins=25, range=None, zorder=0,
             orientation='horizontal', edgecolor=ecol, **hkw)
@@ -467,7 +473,8 @@ for i in range(nplanets):
     ax.fill_betweenx(
         pyrat.atm.press/pc.bar, tp_post[i,1], tp_post[i,3],
         facecolor='royalblue', edgecolor='none', alpha=0.8)
-    plt.plot(tp_post[i,0], pyrat.atm.press/pc.bar,'navy',lw=1.5,label='Median')
+    plt.plot(
+        tp_post[i,0], pyrat.atm.press/pc.bar, 'navy', lw=1.5, label='Median')
     ax.plot(tau_temp[i], tau_press, c='limegreen', lw=1.5)
     plt.plot(tp_best[i], pyrat.atm.press/pc.bar, **bkw1)
     ax.set_ylim(100, 1e-5)

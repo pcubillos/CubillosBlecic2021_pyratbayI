@@ -64,7 +64,7 @@ def main():
         name = f'{planet} {dset.capitalize()}'
         names[i] = name.replace('-0','-')
         with pt.cd(folder):
-            pyrat = pb.run(cfile, init=True, no_logfile=True)
+            pyrat = pb.run(cfile, run_step='init', no_logfile=True)
             teq[i], _ = pa.equilibrium_temp(
                 pyrat.phy.tstar, pyrat.phy.rstar, pyrat.phy.smaxis)
             with np.load(pyrat.ret.mcmcfile) as mcmc:

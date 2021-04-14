@@ -47,7 +47,7 @@ for cfile in cfiles:
     folder, cfg = os.path.split(cfile)
     _, planet, dset = folder.split('_')
     with pt.cd(folder):
-        pyrat = pb.run(cfg, init=True, no_logfile=True)
+        pyrat = pb.run(cfg, run_step='init', no_logfile=True)
         with np.load(pyrat.ret.mcmcfile) as mcmc:
             post, zchain, zmask = mc3.utils.burn(mcmc)
             accept_rate = mcmc['acceptance_rate']

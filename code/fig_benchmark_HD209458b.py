@@ -14,12 +14,12 @@ import mc3
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Read transmission data:
 mm2017 = pb.run(
-    'mcmc_transmission_HD209458b_MM2017.cfg', init=True, no_logfile=True)
+    'mcmc_transmission_HD209458b_MM2017.cfg', run_step='init', no_logfile=True)
 mcmc_mm2017 = np.load(mm2017.ret.mcmcfile)
 bestp_mm2017 = mcmc_mm2017['bestp']
 
 pyrat = pb.run(
-    'mcmc_transmission_HD209458b_P2019.cfg', init=True, no_logfile=True)
+    'mcmc_transmission_HD209458b_P2019.cfg', run_step='init', no_logfile=True)
 
 bf = pyrat.ret.mcmcfile.replace('.npz', '_bestfit_spectrum.dat')
 mcmc_p2019 = np.load(pyrat.ret.mcmcfile)

@@ -43,14 +43,14 @@ q_atm = pa.uniform(press, temp, species, abundances, atmfile=atmfile)
 ipress = 3
 itemp = 9
 
-pyrat = pb.run('H2O_spectrum.cfg', init=True)
+pyrat = pb.run('H2O_spectrum.cfg', run_step='init')
 wl_pyrat = 1.0/(pyrat.spec.wn*pc.um)
 ec_H2O = pyrat.get_ec(ipress)[0][0]
 
-pyrat = pb.run('CO_spectrum.cfg', init=True)
+pyrat = pb.run('CO_spectrum.cfg', run_step='init')
 ec_CO = pyrat.get_ec(ipress)[0][0]
 
-pyrat = pb.run('CO2_spectrum.cfg', init=True)
+pyrat = pb.run('CO2_spectrum.cfg', run_step='init')
 pyrat.iso.ratio[1:] = 1e-30  # Consider only the first isotope
 ec_CO2 = pyrat.get_ec(ipress)[0][0]
 
