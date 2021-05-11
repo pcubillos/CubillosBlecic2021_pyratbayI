@@ -1,8 +1,8 @@
 # Define topdir (in your top working directory) to make your life easier:
 topdir=`pwd`
 
-# Clone (download) the necessary code:
-pip install 'mc3==3.0.7'
+# Install the necessary code:
+pip install 'mc3==3.0.8'
 pip install 'pyratbay==1.0.0'
 
 # Install petitRADTRANS:

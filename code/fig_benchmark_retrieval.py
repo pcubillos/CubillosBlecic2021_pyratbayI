@@ -388,8 +388,11 @@ for i,planet in enumerate(enames):
 tau_press = tm.pressureProfile * pc.pascal/pc.bar
 
 
-rect = [0.07, 0.05, 0.99, 0.38]
-margin = 0.02
+rect_top = [0.07, 0.4, 0.99, 0.99]
+rect_bot = [0.07, 0.05, 0.99, 0.38]
+margin_top = 0.01
+margin_bot = 0.02
+
 
 width = np.array([
 #    W80   Tr1   W6    H1   W43  W94  W17  W31  149  W14  W121  W12
@@ -433,14 +436,13 @@ ranges[6,6] = -4.5, -1.9
 ranges[7,4] = -7.2, -4.9
 
 
-
 plt.figure(11, (8.2, 10))
 plt.clf()
-plt.subplots_adjust(0.07, 0.05, 0.99, 0.99, hspace=0.07, wspace=0.0)
 for p in range(3, em_npars):
     for i in range(nplanets):
         ecol = 'k' if width[p,i] == 0 else 'b'
-        ax = plt.subplot(em_npars, 12, i+1 + 12*(p-3))
+        ax = mp.subplotter(
+            rect_top, margin_top, i+1+12*(p-3), nx=nplanets, ny=em_npars-3)
         vals, bins, h = ax.hist(
             em_posterior[i,p], bins=25, range=None, zorder=0,
             orientation='horizontal', edgecolor=ecol, **hkw)
@@ -466,7 +468,7 @@ for p in range(3, em_npars):
         if p == em_npars - 1:
             ax.set_xlabel(enames[i], fontsize=fs-3)
 for i in range(nplanets):
-    ax = mp.subplotter(rect, margin, i+1, nx=6, ny=2)
+    ax = mp.subplotter(rect_bot, margin_bot, i+1, nx=6, ny=2)
     ax.fill_betweenx(
         pyrat.atm.press/pc.bar, tp_post[i,2], tp_post[i,4],
         facecolor='royalblue', edgecolor='none', alpha=0.6)

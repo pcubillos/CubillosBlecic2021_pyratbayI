@@ -155,11 +155,11 @@ for i in range(ntargets):
 
 
 themes = {
-    '$\\log_{10}(f_{\\rm H2O})$': 'blue',
-    '$\\log_{10}(f_{\\rm CO})$': 'red',
-    '$\\log_{10}(f_{\\rm CO2})$': 'black',
-    '$\\log_{10}(f_{\\rm CH4})$': 'green',
-    '$\\log_{10}(f_{\\rm HCN})$': 'orange',
+    '$\\log_{10}(X_{\\rm H2O})$': 'blue',
+    '$\\log_{10}(X_{\\rm CO})$': 'red',
+    '$\\log_{10}(X_{\\rm CO2})$': 'black',
+    '$\\log_{10}(X_{\\rm CH4})$': 'green',
+    '$\\log_{10}(X_{\\rm HCN})$': 'orange',
     }
 
 line1 = mlines.Line2D(

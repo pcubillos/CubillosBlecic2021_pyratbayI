@@ -88,7 +88,7 @@ for i in range(len(xs)):
             plt.legend(loc='upper right', fontsize=fs)
         if i == 1 and j == 0:
             plt.ylabel(
-                r'Opacity cross section (cm$^{2}$ molec$^{-1}$)', fontsize=fs+1)
+                r'Cross section (cm$^{2}$ molecule$^{-1}$)', fontsize=fs+1)
         if i == 0 and  j == 0:
             plt.text(0.03, 0.8, f'$T$ = {temp_exomol[itemp]:.0f} K',
                      fontsize=fs, transform=ax.transAxes)

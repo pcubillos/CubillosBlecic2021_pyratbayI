@@ -56,7 +56,8 @@ iCH4 = species.index('CH4')
 iNa  = species.index('Na')
 iK   = species.index('K')
 
-molecs, mass, diameter = io.read_molecs(f'{pc.ROOT}/inputs/molecules.dat')
+molecs, mass, diameter = io.read_molecs(
+    f'{pc.ROOT}/pyratbay/data/molecules.dat')
 H2_mass  = mass[molecs=='H2'][0]
 He_mass  = mass[molecs=='He'][0]
 H2O_mass = mass[molecs=='H2O'][0]

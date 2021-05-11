@@ -9,10 +9,10 @@ Monthly Notices of the Royal Astronomical Society. To download the compendium to
 git clone https://github.com/pcubillos/CubillosBlecic2021_pyratbayI
 ```
 
-Then, cd into the folder, and follow the commands from the '**compendium.sh**' file.  This Shell script contains all necessary instructions to reproduce the analysis of this article.
+Then, cd into the folder and follow the commands from the '**compendium.sh**' file.  This Shell script contains all necessary instructions to reproduce the analysis of this article.
 
 ``Pyrat Bay`` is available for installation from PyPI: ``pip install pyratbay``  
 or from conda: ``conda install -c conda-forge pyratbay``
 
-The code is available at https://github.com/pcubillos/pyratbay  
+The source code is available (GNU GPL2) at https://github.com/pcubillos/pyratbay  
 The documentation is available at <http://pyratbay.readthedocs.io>.

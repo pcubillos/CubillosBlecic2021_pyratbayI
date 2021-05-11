@@ -29,9 +29,9 @@ def read_obs_file(obs_file, out_path='.', make_filters=True):
 
         if inst.startswith("irac"):
             channel = irac_channel[wave]
-            ffile = f"{{ROOT}}/inputs/filters/spitzer_irac{channel}_sa.dat"
+            ffile = f"{{ROOT}}/pyratbay/data/filters/spitzer_irac{channel}_sa.dat"
         elif inst.startswith("mips"):
-            ffile = "{ROOT}/inputs/filters/spitzer_mips24.dat"
+            ffile = "{ROOT}/pyratbay/data/filters/spitzer_mips24.dat"
         else:
             ffile = f"{out_path}/{data_set}_{inst}_{wave:5.3f}um.dat"
             if make_filters:
