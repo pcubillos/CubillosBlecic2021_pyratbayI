@@ -2,6 +2,7 @@
 topdir=`pwd`
 
 # Install the necessary code:
+# (the strong advise is to work in a new/dedicated virtual environment):
 pip install 'mc3==3.0.8'
 pip install 'pyratbay==1.0.0'
 
